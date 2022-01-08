@@ -25,24 +25,45 @@ def main():
     screen = p.display.set_mode((WIDTH, HEIGHT))    #sets a drawing window according to the HEIGHT and WIDTH specifications set above
     clock = p.time.Clock()  #creates a clock object (built into pygame)
     screen.fill((255, 255, 255))    #sets the screen to be white lol
-    game_state = chess_machine.game_state() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
+    game_state = chess_machine.Game_State() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
     load_images()   #calls load_images method - we only do it once to conserve computing time
-
+    square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
+    player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
 
     #Run until user asks to quit
     running = True
     while running:
         
-        for event in p.event.get(): #asks whether user has clicked window close button
-            if event.type == p.QUIT:
+        for event in p.event.get(): #iterates through all the "events" -- includes clicks, button presses, etc
+            if event.type == p.QUIT:    #asks whether user has clicked window close button
                 running = False     #if so, quits game
 
         #mouse handler
+            elif event.type == p.MOUSEBUTTONDOWN: #asks whether user clicks somewhere on the screen
+                location = p.mouse.get_pos() #gets the (x, y) location of mouse
+                col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
+                row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
+                
+                #check if square is ALREADY SELECTED
+                if square_selected == (row, col):        #the user clicked the same square twice
+                    square_selected = ()        #deselect
+                    player_clicks = []  #clear player_clicks
+                else:
+                    square_selected = (row, col) #stores location of click in square_selected variable
+                    player_clicks.append(square_selected) #adds the location of the click to the list 
+
+                #was that the second click?
+                if len(player_clicks) == 2:     #after the second click
+                    #now we make our move!
+                    move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
+                    print(move.get_chess_notation())    #prints chess notation for the above move
+                    game_state.make_move(move)  #calls the make move method to actually update the game_state
+
+
 
         #key handler
 
         draw_game_state(screen, game_state) #calls draw_game_state to draw the current state
-
 
 
 
@@ -83,3 +104,46 @@ def draw_pieces(screen, board):
 #def draw_move_log(screen, game_state): #FOR LATER
 
 main() #calls the main method
+
+
+
+
+
+
+class Move():
+
+    #conversion strings -- changing the ranks and files found in common chess notation to the rows and columns of our board matrix 
+    #maps keys to values
+    #key : value
+    ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}       #converts each rank of squares in standard chess notation to a row in the board matrix. For reference, the black pieces start out at RANK 8 but ROW 0. The white pieces start at RANK 1 but ROW 7.  
+    rows_to_ranks = {7: "1", 6: "2", 5: "3", 4: "4", 3: "5", 2: "6", 1: "7", 0: "8"}       #same thing but vice versa
+    files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}       #converts each file of squares in standard chess notation to a column in the board matrix.
+    cols_to_files = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}       #same thing but vice versa
+
+
+    def __init__(self, start_square, end_square, board):        #Note: start_square and end_square are tuples
+        self.start_row = start_square[0]    #creates a variable for starting row (getting the row coordinate of the tuple)
+        self.start_col = start_square[1]    #creates a variable for starting column (getting the column coordinate of the tuple)
+        self.end_row = end_square[0]        #same thing, but for end_row
+        self.end_col = end_square[1]        #same thing, but for end_col
+        self.piece_moved = board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
+        self.piece_captured = board[self.end_row][self.end_col]     #gets the piece located on the board at the ending square. This is the piece that is captured by any given move. Might end up being "--".
+
+
+    #conversion method from matrix notation to chess notation (e.g. [6, 4] would become ["e", "3"]). I'm lazy. That's why this exists.
+    def get_chess_notation(self):
+        return self.get_rank_file(self.start_row, self.start_col) + self.get_rank_file(self.end_row, self.end_col)  #creates a string that is a concatenation of starting square and ending square in chess notation. E.g. "e4e5"
+
+    #helper method to get rank and file given row and column
+    def get_rank_file(self, row, col):
+        return self.cols_to_files[col] + self.rows_to_ranks[row]    #returns the file corresponding to the column "col" + the rank corresponding to the row "row". File then rank, because thats how chess notation works
+
+
+
+
+def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
+    self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
+    self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
+    self.move_log.append(move)  #logs the move -- adds it to move log at the end of the log
+    self.is_white_turn = not self.is_white_turn #changes turn from white to black or vice versa
+
