@@ -29,14 +29,29 @@ class Game_State:
         solution = []
         piece = self.pieceAtCoordinates(self, row, column)
         
+        #add to the solution variable all the possible moves if the piece is a white pawn
         if(piece == "wP"):
-            if(row > 0 and (self.board[row - 1][column])[0] != "w"):
+            if(row > 0 and self.piece_at_coordinates(self, row - 1, column)[0] != "w"):
                 solution += [row - 1, column]
-                if(row == 6 and (self.board[row - 2][column])[0] != "w"):
+                if(row == 6 and self.piece_at_coordinates(self, row - 2, column)[0] != "w"):
                     solution += [row - 2, column]
-            
+            if(row > 0 and (column > 0 and column < 7)):
+                if(self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
+                    solution += [row - 1, column - 1]
+                if(self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
+                    solution += [row - 1, column + 1]
+        
+        #add to the solution variable all the possible moves if the piece is a black pawn
         if(piece == "bP"):
-            if(row < 7 and (self.board[row + 1][column])[0] != "b"):
+            if(row < 7 and self.piece_at_coordinates(self, row + 1, column)[0] != "b"):
                 solution += [row + 1, column]
-                if(row == 1 and (self.board[row + 2][column])[0] != "b"):
+                if(row == 1 and self.piece_at_coordinates(self, row + 2, column)[0] != "b"):
                     solution += [row + 2, column]
+            if(row < 7 and (column > 0 and column < 7)):
+                if(self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
+                    solution += [row + 1, column - 1]
+                if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
+                    solution += [row + 1, column + 1]
+
+        #add to the solution variable all the possible moves if the piece is a rook
+        if(piece[1] == "R"):
