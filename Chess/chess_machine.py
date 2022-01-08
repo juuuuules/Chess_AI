@@ -6,14 +6,14 @@ class Game_State:
         #Board is an 8x8 2d list, each element has 2 characters.
         #First char represents color
         #Second char represents type of piece
-        row1 = ["bR", "bN", "bB", "bQ", "bK", "bB", "bK", "bR"]
+        row1 = ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"]
         row2 = ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"]
         row3 = ["--", "--", "--", "--", "--", "--", "--", "--"]
         row4 = ["--", "--", "--", "--", "--", "--", "--", "--"]
         row5 = ["--", "--", "--", "--", "--", "--", "--", "--"]
         row6 = ["--", "--", "--", "--", "--", "--", "--", "--"]
         row7 = ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"]
-        row8 = ["wR", "wN", "wB", "wQ", "wK", "wB", "wK", "wR"]
+        row8 = ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         board = [row1, row2, row3, row4, row5, row6, row7, row8]
         self.board = board
 
