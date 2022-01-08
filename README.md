@@ -1,4 +1,7 @@
 # Chess_AI
 For the senior project
 
-we're building a chess program where the user plays against an algorithm
+
+There will be two options:
+- User vs User
+- User vs Computer
