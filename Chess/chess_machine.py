@@ -1,9 +1,7 @@
-class Game_State{
-    def __init__(self){
+class Game_State:
+    def __init__(self):
         self.turn = "white"
         self.state = board
-    }
-}
 
 row1 = ["bR", "bN", "bB", "bQ", "bK", "bB", "bK", "bR"]
 row2 = ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"]
