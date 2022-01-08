@@ -1,7 +1,8 @@
+
 # Main driver file - responsible for handling user input and displaying current GameState object
 
 import pygame as p
-from Chess import chess_machine
+import chess_machine
 
 p.init()        #initializes pygame
 WIDTH = HEIGHT = 1000   #sets width and height of display to 1000x1000 pixels 
@@ -15,7 +16,7 @@ IMAGES = {} #Creates a global images directort
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
+        IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
     #Note: Use  ' IMAGES['wP'] '  to access an image
 
 
@@ -35,6 +36,15 @@ def main():
         for event in p.event.get(): #asks whether user has clicked window close button
             if event.type == p.QUIT:
                 running = False     #if so, quits game
+
+        #mouse handler
+
+        #key handler
+
+        draw_game_state(screen, game_state)
+
+
+
 
         clock.tick()    #updates the clock -- called once per frame; computes how many milliseconds have passed since previous call
         p.display.flip()    #updates entire display
@@ -58,6 +68,9 @@ def draw_board(screen):
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #draws a colored rectangle beginning at c*SQ_SIZE and r*SQ_SIZE with dimmensions SQ_SIZE * SQ_SIZE
 
 
+#def highlight_squares(screen, game_state, valid_moves, square_selected): #FOR LATER
+
+
 #Draw pieces on the board using current game_state.board
 def draw_pieces(screen, board):
     for r in range(DIMENSION):      #double for loop to iterate over the board and go square by square
@@ -67,7 +80,6 @@ def draw_pieces(screen, board):
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #outputs the image of the identified piece at location c*SQ_SIZE r*SQ_SIZE with dimensions SQ_SIZE * SQ_SIZE
 
 
+#def draw_move_log(screen, game_state): #FOR LATER
 
-
-
-
+main() #calls the main method
