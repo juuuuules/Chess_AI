@@ -9,4 +9,9 @@ while i < 15:
 for i in range(1, 10):
     print(i)
 
+<<<<<<< HEAD
 print("reeeeeeeeeeeeeeeeeeeeee")
+=======
+
+print("julien is amazing")
+>>>>>>> b3ec64ceb314caae2d5f12342a5ca9c7dabaa80b
