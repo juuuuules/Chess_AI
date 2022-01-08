@@ -2,8 +2,6 @@ class Game_State:
     def __init__(self):
         self.isWhiteTurn = True
         self.board = board
-    def sidIsGreat(self):
-        print("sid is great")
 
 row1 = ["bR", "bN", "bB", "bQ", "bK", "bB", "bK", "bR"]
 row2 = ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"]
