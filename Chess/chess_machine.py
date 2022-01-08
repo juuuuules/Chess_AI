@@ -19,6 +19,49 @@ class Game_State:
 
         self.is_white_turn = True
         self.move_log = []
+    
+    def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
+        self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
+        self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
+        self.move_log.append(move)  #logs the move -- adds it to move log at the end of the log
+        self.is_white_turn = not self.is_white_turn #changes turn from white to black or vice versa
+
+
+
+
+    #return an array of all possible moves for the piece at the inputed square
+    def get_valid_moves(self, row, column):
+        solution = []
+        piece = self.pieceAtCoordinates(self, row, column)
+        
+        #add to the solution variable all the possible moves if the piece is a white pawn
+        if(piece == "wP"):
+            if(row > 0 and self.piece_at_coordinates(self, row - 1, column)[0] != "w"):
+                solution += [row - 1, column]
+                if(row == 6 and self.piece_at_coordinates(self, row - 2, column)[0] != "w"):
+                    solution += [row - 2, column]
+            if(row > 0 and (column > 0 and column < 7)):
+                if(self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
+                    solution += [row - 1, column - 1]
+                if(self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
+                    solution += [row - 1, column + 1]
+        
+        #add to the solution variable all the possible moves if the piece is a black pawn
+        if(piece == "bP"):
+            if(row < 7 and self.piece_at_coordinates(self, row + 1, column)[0] != "b"):
+                solution += [row + 1, column]
+                if(row == 1 and self.piece_at_coordinates(self, row + 2, column)[0] != "b"):
+                    solution += [row + 2, column]
+            if(row < 7 and (column > 0 and column < 7)):
+                if(self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
+                    solution += [row + 1, column - 1]
+                if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
+                    solution += [row + 1, column + 1]
+
+        #add to the solution variable all the possible moves if the piece is a rook
+        if(piece[1] == "R"):
+
+
 
 
 class Move():
@@ -52,8 +95,5 @@ class Move():
 
 
 
-def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
-    self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
-    self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
-    self.move_log.append(move)  #logs the move -- adds it to move log at the end of the log
-    self.is_white_turn = not self.is_white_turn #changes turn from white to black or vice versa
+
+
