@@ -13,3 +13,4 @@ row7 = ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"]
 row8 = ["wR", "wN", "wB", "wQ", "wK", "wB", "wK", "wR"]
 
 board = [row1, row2, row3, row4, row5, row6, row7, row8]
+#asdffdsa
