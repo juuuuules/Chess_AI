@@ -41,7 +41,7 @@ def main():
 
         #key handler
 
-        draw_game_state(screen, game_state)
+        draw_game_state(screen, game_state) #calls draw_game_state to draw the current state
 
 
 
