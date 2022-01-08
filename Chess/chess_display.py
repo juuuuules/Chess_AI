@@ -59,7 +59,7 @@ def main():
                     print(move.get_chess_notation())    #prints chess notation for the above move
                     game_state.make_move(move)  #calls the make move method to actually update the game_state
                     square_selected = ()    #reset user clicks
-                    player_clicks = []
+                    player_clicks = []      #resets user clicks
 
         #key handler
 
