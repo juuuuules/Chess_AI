@@ -1,6 +1,4 @@
 # Chess_AI
 For the senior project
 
-this is a test for pushing code to github
-
-asdflk;jasdf;lkjasdf;lkjasdf;lkjfasd
+we will be building a chess playing game where an algorithm plays against a player
