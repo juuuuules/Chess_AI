@@ -58,8 +58,8 @@ def main():
                     move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
                     print(move.get_chess_notation())    #prints chess notation for the above move
                     game_state.make_move(move)  #calls the make move method to actually update the game_state
-
-
+                    square_selected = ()    #reset user clicks
+                    player_clicks = []
 
         #key handler
 
