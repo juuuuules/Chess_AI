@@ -35,8 +35,8 @@ class Game_State:
         piece = self.pieceAtCoordinates(self, row, column)
         
         #add to the solution variable all the possible moves if the piece is a white pawn
-        if(piece == "wP"):
-            if(row > 0 and self.piece_at_coordinates(self, row - 1, column)[0] != "w"):
+        if(piece == "wP"): #checks to see if the selected square has a white pawn
+            if(row > 0 and self.piece_at_coordinates(self, row - 1, column)[0] != "w"): 
                 solution += [row - 1, column]
                 if(row == 6 and self.piece_at_coordinates(self, row - 2, column)[0] != "w"):
                     solution += [row - 2, column]
