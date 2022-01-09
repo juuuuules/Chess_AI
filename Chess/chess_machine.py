@@ -19,7 +19,16 @@ class Game_State:
 
         self.is_white_turn = True #pretty self explantory
         self.move_log = [] #this will contain all previous moves when we finally implement that function
-    
+
+        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
+
+        
+    #overriding the equals method
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
+
     def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
         self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
         self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
