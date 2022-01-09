@@ -33,6 +33,11 @@ class Game_State:
     #return an array of all possible moves for the piece at the inputed square
     #the array will be 2 dimensional, and each element in the array will be an array of length 2 with the row and column 
     #of a square that the inputed piece can move to
+
+    #EVAN, IMO WE SHOULD MAKE DIFFERENT METHODS BASED ON PAWNS, ROOK, NIGHT, BISHOP, ETC. SO WE WOULD HAVE get_pawn_moves, get_bishop_moves, etc.
+    # THEN, WE COULD CREATE A MAP AT THE TOP THAT SAYS SOMETHING LIKE {"P": self. get_pawn_moves, "R": self.get_rook_moves, etc}.
+    # THEN, the get_valid_moves method would just call the appropriate getter method depending on the given piece at the location.
+    # Makes it much easier to read and less computationally intensive, bc the computer doesn't have to read a ton of if statements many times per frame 
     def get_valid_moves(self, row, column):
         solution = []
         piece = self.piece_at_coordinates(self, row, column)
