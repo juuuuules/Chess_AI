@@ -218,18 +218,19 @@ class Game_State:
                 color = self.board[r][c][0]  #extracts the first character of a given string in the 8x8 array. That returns the COLOR of the piece at any particular square.
                 if (color == 'w' and self.is_white_turn) or (color == 'b' and not self.is_white_turn):   #if color of piece matches who's turn it is, then look at that piece as a valid piece to move
                     piece = self.board[r][c][1] #extracts the second character of the string -- that gives the piece type, i.e. 'P', 'R', 'Q', etc.
-                    if piece.equals('P'):   #if piece is a pawn
+                    if piece == 'P':   #if piece is a pawn
                         self.get_pawn_moves(r, c, moves)    #gets all possible pawn moves
-                    elif piece.equals('R'): 
+                    elif piece == 'R': 
                         self.get_rook_moves(r, c, moves)
-                    elif piece.equals('Q'):
+                    elif piece == 'Q':
                         self.get_queen_moves(r, c, moves)
-                    elif piece.equals('N'):
+                    elif piece == 'N':
                         self.get_knight_moves(r, c, moves)
-                    elif piece.equals('B'):
+                    elif piece == 'B':
                         self.get_bishop_moves(r, c, moves)
-                    elif piece.equals('K'):
+                    elif piece == 'K':
                         self.get_king_moves(r, c, moves)
+        return moves
 
     def get_pawn_moves(self, row, column, moves):
         #figure this out later and copy-paste evan's code

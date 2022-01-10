@@ -26,7 +26,12 @@ def main():
     screen = p.display.set_mode((WIDTH, HEIGHT))    #sets a drawing window according to the HEIGHT and WIDTH specifications set above
     clock = p.time.Clock()  #creates a clock object (built into pygame)
     screen.fill((255, 255, 255))    #sets the screen to be white lol
+    
     game_state = chess_machine.Game_State() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
+    valid_moves = game_state.get_valid_moves()  #greates a list of valid moves by calling the get_valid_moves method. Don't want to call this every frame, because it costs a lot of computing time
+    move_made = False   #flag variable - used so that we only generate a new set of valid moves by calling get_valid_moves once the game_state has been updated
+
+    
     load_images()   #calls load_images method - we only do it once to conserve computing time
     square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
     player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
@@ -58,16 +63,22 @@ def main():
                     #now we make our move!
                     move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
                     print(move.get_chess_notation())    #prints chess notation for the above move
-                    game_state.make_move(move)  #calls the make move method to actually update the game_state
+                    if move in valid_moves:    #checks whether the move is a valid move
+                        game_state.make_move(move)  #calls the make move method to actually update the game_state
+                        move_made = True    #sets flag variable to true -- indication that a new set of valid_moves needs to be generated
                     square_selected = ()    #reset user clicks
                     player_clicks = []      #resets user clicks
 
             #key handler
             elif event.type == p.KEYDOWN:
+                #UNDO MOVE
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
                     game_state.undo_move()  #calls undo move
+                    move_made = True    #sets flag variable to true in order to generate a new set of valid moves
 
-
+        if move_made:   #once a move has been made, generate a new set of valid moves
+            valid_moves = game_state.get_valid_moves()
+            move_made = False
 
 
 
