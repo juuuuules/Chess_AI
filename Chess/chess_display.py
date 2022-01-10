@@ -2,6 +2,7 @@
 # Main driver file - responsible for handling user input and displaying current GameState object
 
 import pygame as p
+from pygame.constants import KEYDOWN, K_z
 import chess_machine
 
 p.init()        #initializes pygame
@@ -19,7 +20,7 @@ def load_images():
         IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
     #Note: Use  ' IMAGES['wP'] '  to access an image
 
-
+    
 #Main method - handles user input, updates graphics
 def main():
     screen = p.display.set_mode((WIDTH, HEIGHT))    #sets a drawing window according to the HEIGHT and WIDTH specifications set above
@@ -61,7 +62,15 @@ def main():
                     square_selected = ()    #reset user clicks
                     player_clicks = []      #resets user clicks
 
-        #key handler
+            #key handler
+            elif event.type == p.KEYDOWN:
+                if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
+                    game_state.undo_move()  #calls undo move
+
+
+
+
+
 
         draw_game_state(screen, game_state) #calls draw_game_state to draw the current state
 
