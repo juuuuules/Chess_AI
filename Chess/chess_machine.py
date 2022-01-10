@@ -2,6 +2,8 @@
 #Might keep move log????
 
 class Game_State:
+
+    #constructor
     def __init__(self):
         #Board is an 8x8 2d list, each element has 2 characters.
         #First char represents color
@@ -19,6 +21,8 @@ class Game_State:
 
         self.is_white_turn = True #pretty self explantory
         self.move_log = [] #this will contain all previous moves when we finally implement that function
+
+        self.valid_moves = []
 
 
 #        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
@@ -58,8 +62,10 @@ class Game_State:
     # THEN, WE COULD CREATE A MAP AT THE TOP THAT SAYS SOMETHING LIKE {"P": self. get_pawn_moves, "R": self.get_rook_moves, etc}.
     # THEN, the get_valid_moves method would just call the appropriate getter method depending on the given piece at the location.
     # Makes it much easier to read and less computationally intensive, bc the computer doesn't have to read a ton of if statements many times per frame 
-    def get_valid_moves(self, row, column):
-        solution = []
+    
+    #also, i changed the name to get_possible_moves, because we should have a SEPARATE function that considers checks. I.e. a pawn cannot move if it is pinned
+    #also, I made solution[] a global variable and renamed it possible_moves[]
+    def get_possible_moves(self, row, column):
         piece = self.piece_at_coordinates(self, row, column)
         
         #add to the solution variable all the possible moves if the piece is a white pawn
@@ -69,12 +75,12 @@ class Game_State:
             #and if the piece at the square directly in front of the pawn is empty,
             #than say that the square directly in front of the pawn is a possible move (by adding that square to the solution array)
             if(row > 0 and self.piece_at_coordinates(self, row - 1, column) == "--"): 
-                solution += [row - 1, column]
+                self.possible_moves += [row - 1, column]
 
                 #this if statements adds an extra scenario where, if the pawn is on it's starting row, it can move 2 pieces forward
                 #so long as the square 2 pieces forward is empty
                 if(row == 6 and self.piece_at_coordinates(self, row - 2, column) == "--"):
-                    solution += [row - 2, column]
+                    self.possible_moves += [row - 2, column]
 
             #this collection of if statements adds the possibility of the pawn moving diagonally to the solution array
             #it says, if the pawn is not on the 0th row,
@@ -85,13 +91,13 @@ class Game_State:
                 if(self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
 
                     #than allow that move to be added to the solution array
-                    solution += [row - 1, column - 1]
+                    self.possible_moves += [row - 1, column - 1]
 
                 #alternatively, if the piece one up and to the right of the selected pawn is black,
                 if(self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
 
                     #than add the square one up and to the right of the selected pawn to the solution array
-                    solution += [row - 1, column + 1]
+                    self.possible_moves += [row - 1, column + 1]
         
         #this adds to the solution variable all the possible moves if the piece is a black pawn
         #this basically works the same as the previous collection of if statements
@@ -103,14 +109,14 @@ class Game_State:
             if(row < 7 and self.piece_at_coordinates(self, row + 1, column) == "--"):
 
                 #adds the square in front of the pawn to the solution array of possible moves
-                solution += [row + 1, column]
+                self.possible_moves += [row + 1, column]
 
                 #adds the extra check to see if the pawn is on it's starting row and if so, if it can move 2 forward
                 #it checks to see if the square 2 in front of the pawn is empty
                 if(row == 1 and self.piece_at_coordinates(self, row + 2, column)[0] == "--"): 
 
                     #adds the option to move 2 forward to the solution array
-                    solution += [row + 2, column]
+                    self.possible_moves += [row + 2, column]
 
             #this adds the possibility of the pawn moving diagnally to take other pieces
             if(row < 7 and (column > 0 and column < 7)): #checks that the pawn is not on the last row and not on the -->
@@ -120,13 +126,13 @@ class Game_State:
                 if(self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
 
                     #if so it adds that square (one down and one to the left) to the solution array of possible moves
-                    solution += [row + 1, column - 1]
+                    self.possible_moves += [row + 1, column - 1]
 
                 #checks if the piece one below and one to the right of the pawn is white
                 if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
                     
                     #if so it adds that square (one below and one to the right) to the solution array of possible moves
-                    solution += [row + 1, column + 1]
+                    self.possible_moves += [row + 1, column + 1]
 
         #add to the solution variable all the possible moves if the piece is a rook
         if(piece[1] == "R"):
@@ -137,11 +143,11 @@ class Game_State:
             while(keepLooping):
                 if(row - indexVariable >= 0):
                     if(self.piece_at_coordinates(self, row - indexVariable, column) == "--"):
-                        solution += [row - indexVariable, column]
+                        self.possible_moves += [row - indexVariable, column]
                     elif(self.piece_at_coordinates(self, row - indexVariable, column)[0] == self.piece_at_coordinates(self, row, column)[0]):
                         keepLooping = False
                     elif(self.piece_at_coordinates(self, row - indexVariable, column)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        solution += [row - indexVariable, column]
+                        self.possible_moves += [row - indexVariable, column]
                         keepLooping = False
                 else:
                     keepLooping = False
@@ -154,11 +160,11 @@ class Game_State:
             while(keepLooping):
                 if(row + indexVariable <= 7):
                     if(self.piece_at_coordinates(self, row + indexVariable, column) == "--"):
-                        solution += [row + indexVariable, column]
+                        self.possible_moves += [row + indexVariable, column]
                     elif(self.piece_at_coordinates(self, row + indexVariable, column)[0] == self.piece_at_coordinates(self, row, column)[0]):
                         keepLooping = False
                     elif(self.piece_at_coordinates(self, row + indexVariable, column)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        solution += [row + indexVariable, column]
+                        self.possible_moves += [row + indexVariable, column]
                         keepLooping = False
                 else:
                     keepLooping = False
@@ -171,11 +177,11 @@ class Game_State:
             while(keepLooping):
                 if(column - indexVariable >= 0):
                     if(self.piece_at_coordinates(self, row, column - indexVariable) == "--"):
-                        solution += [row, column - indexVariable]
+                        self.possible_moves += [row, column - indexVariable]
                     elif(self.piece_at_coordinates(self, row, column - indexVariable)[0] == self.piece_at_coordinates(self, row, column)[0]):
                         keepLooping = False
                     elif(self.piece_at_coordinates(self, row, column - indexVariable)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        solution += [row, column - indexVariable]
+                        self.possible_moves += [row, column - indexVariable]
                         keepLooping = False
                 else:
                     keepLooping = False
@@ -188,15 +194,77 @@ class Game_State:
             while(keepLooping):
                 if(column + indexVariable <= 7):
                     if(self.piece_at_coordinates(self, row, column + indexVariable) == "--"):
-                        solution += [row, column + indexVariable]
+                        self.possible_moves += [row, column + indexVariable]
                     elif(self.piece_at_coordinates(self, row, column + indexVariable)[0] == self.piece_at_coordinates(self, row, column)[0]):
                         keepLooping = False
                     elif(self.piece_at_coordinates(self, row, column + indexVariable)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        solution += [row, column + indexVariable]
+                        self.possible_moves += [row, column + indexVariable]
                         keepLooping = False
                 else:
                     keepLooping = False
                 indexVariable += 1
+
+    #of the possible moves that can occur, filters out the ones that would result in a check
+    def get_valid_moves(self):
+        #Pseudo code:
+        # 1 - get all possible moves. Calls the get_possible_moves method.
+        # 2 - generates all moves for the OPPOSING player
+        # 3 - sees if any of those moves attacks king
+        # 4 - if and only if the king is safe, add that element of possible_moves[] to valid_moves[]
+        return self.get_possible_moves_MODIFIED()
+
+    #looks at the whole board, and generates all the possible moves that a given side can make. This includes pieces moving while pinned, kings moving into check, etc.
+    def get_possible_moves_MODIFIED(self):
+        moves = []
+        for r in range(len(self.board)): #iterates through the rows
+            for c in range(len(self.board[r])):  #iterates through the columns in a given row
+                color = self.board[r][c][0]  #extracts the first character of a given string in the 8x8 array. That returns the COLOR of the piece at any particular square.
+                if (color == 'w' and self.is_white_turn) or (color == 'b' and not self.is_white_turn):   #if color of piece matches who's turn it is, then look at that piece as a valid piece to move
+                    piece = self.board[r][c][1] #extracts the second character of the string -- that gives the piece type, i.e. 'P', 'R', 'Q', etc.
+                    if piece.equals('P'):   #if piece is a pawn
+                        self.get_pawn_moves(r, c, moves)    #gets all possible pawn moves
+                    elif piece.equals('R'): 
+                        self.get_rook_moves(r, c, moves)
+                    elif piece.equals('Q'):
+                        self.get_queen_moves(r, c, moves)
+                    elif piece.equals('N'):
+                        self.get_knight_moves(r, c, moves)
+                    elif piece.equals('B'):
+                        self.get_bishop_moves(r, c, moves)
+                    elif piece.equals('K'):
+                        self.get_king_moves(r, c, moves)
+
+    def get_pawn_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+    def get_rook_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+    def get_queen_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+    def get_knight_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+    def get_bishop_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+    def get_king_moves(self, row, column, moves):
+        #figure this out later and copy-paste evan's code
+        pass
+
+
+
+
+
+
+
+
 
 
 
