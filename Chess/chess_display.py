@@ -63,7 +63,7 @@ def main():
                     #now we make our move!
                     move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
                     print(move.get_chess_notation())    #prints chess notation for the above move
-                    if move in valid_moves:    #checks whether the move is a valid move
+                    if move in valid_moves:    #checks whether the move is an element of a valid move. PROBLEM: THIS WILL NOT WORK WITHOUT OVERWRITING THE EQUALS METHOD. OTHERWISE, THE COMPUTER HAS NO WAY OF KNOWING WHETHER THE MOVE MADE BY THE USER'S CLICKS IS EQUAL TO A MOVE IN THE MOVES[] LIST
                         game_state.make_move(move)  #calls the make move method to actually update the game_state
                         move_made = True    #sets flag variable to true -- indication that a new set of valid_moves needs to be generated
                     square_selected = ()    #reset user clicks

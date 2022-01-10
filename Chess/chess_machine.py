@@ -280,7 +280,7 @@ class Move():
     files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}       #converts each file of squares in standard chess notation to a column in the board matrix.
     cols_to_files = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}       #same thing but vice versa
 
-
+    #constructor
     def __init__(self, start_square, end_square, board):        #Note: start_square and end_square are tuples
         self.start_row = start_square[0]    #creates a variable for starting row (getting the row coordinate of the tuple)
         self.start_col = start_square[1]    #creates a variable for starting column (getting the column coordinate of the tuple)
@@ -288,6 +288,16 @@ class Move():
         self.end_col = end_square[1]        #same thing, but for end_col
         self.piece_moved = board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
         self.piece_captured = board[self.end_row][self.end_col]     #gets the piece located on the board at the ending square. This is the piece that is captured by any given move. Might end up being "--".
+        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col   #gives each move a unique move id between 0 and 7777. Useful when comparing whether two moves are equal.
+    
+    #Overriding the equals method. This means that two moves are considered "equal" if they have the same start row, start col, end row, and end col. That information is nicely tracked in the move ID variable
+    #This is copy-pasted from stack exchange lol
+    def __eq__(self, other):    #comparing the self object to another move object, saved in the parameter other
+        if isinstance(other, Move): #if "other" object is an instance of the Move class
+             return self.moveID == other.moveID #returns true if two move IDs are the same, and false if they are different.
+        return False
+
+
 
 
     #conversion method from matrix notation to chess notation (e.g. [6, 4] would become ["e", "3"]). I'm lazy. That's why this exists.
