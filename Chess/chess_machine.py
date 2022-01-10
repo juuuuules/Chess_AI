@@ -23,7 +23,7 @@ class Game_State:
         self.move_log = [] #this will contain all previous moves when we finally implement that function
 
         self.valid_moves = []
-
+#t
 
 #        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
@@ -83,19 +83,15 @@ class Game_State:
                     self.possible_moves += [row - 2, column]
 
             #this collection of if statements adds the possibility of the pawn moving diagonally to the solution array
-            #it says, if the pawn is not on the 0th row,
-            #and if it is not on the farthest column to the left or the farthest column to the right,
-            if(row > 0 and (column > 0 and column < 7)):
+            #it says, if the pawn is not on the 0th row
 
-                #than if the piece one up and one to the left of the selected pawn is black,
-                if(self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
+            #than if the piece one up and one to the left of the selected pawn is black,
+            if(column > 0 and self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
+                #than allow that move to be added to the solution array
+                self.possible_moves += [row - 1, column - 1]
 
-                    #than allow that move to be added to the solution array
-                    self.possible_moves += [row - 1, column - 1]
-
-                #alternatively, if the piece one up and to the right of the selected pawn is black,
-                if(self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
-
+            #alternatively, if the piece one up and to the right of the selected pawn is black,
+            if(column < 7 and self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
                     #than add the square one up and to the right of the selected pawn to the solution array
                     self.possible_moves += [row - 1, column + 1]
         
@@ -119,20 +115,22 @@ class Game_State:
                     self.possible_moves += [row + 2, column]
 
             #this adds the possibility of the pawn moving diagnally to take other pieces
-            if(row < 7 and (column > 0 and column < 7)): #checks that the pawn is not on the last row and not on the -->
-                #leftmost or rightmost columns
 
-                #checks if the piece one below and one to the left of the pawn is white
-                if(self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
+            #checks if the piece one below and one to the left of the pawn is white
+            if(column > 0 and self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
 
                     #if so it adds that square (one down and one to the left) to the solution array of possible moves
                     self.possible_moves += [row + 1, column - 1]
 
                 #checks if the piece one below and one to the right of the pawn is white
-                if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
-                    
-                    #if so it adds that square (one below and one to the right) to the solution array of possible moves
-                    self.possible_moves += [row + 1, column + 1]
+            if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
+                #if so it adds that square (one below and one to the right) to the solution array of possible moves
+                self.possible_moves += [row + 1, column + 1]
+
+            #checks if the piece one below and one to the right of the pawn is white
+            if(column < 7 and self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
+                #if so it adds that square (one below and one to the right) to the solution array of possible moves
+                self.possible_moves += [row + 1, column + 1]
 
         #add to the solution variable all the possible moves if the piece is a rook
         if(piece[1] == "R"):
