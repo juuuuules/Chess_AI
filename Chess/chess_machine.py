@@ -23,7 +23,6 @@ class Game_State:
         self.move_log = [] #this will contain all previous moves when we finally implement that function
 
         self.valid_moves = []
-#t
 
 #        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
