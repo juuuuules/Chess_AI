@@ -64,8 +64,8 @@ class Game_State:
     # Makes it much easier to read and less computationally intensive, bc the computer doesn't have to read a ton of if statements many times per frame 
     
     #also, i changed the name to get_possible_moves, because we should have a SEPARATE function that considers checks. I.e. a pawn cannot move if it is pinned
-    #also, I made solution[] a global variable and renamed it possible_moves[]
     def get_possible_moves(self, row, column):
+        possible_moves = []
         piece = self.piece_at_coordinates(self, row, column)
         
         #add to the solution variable all the possible moves if the piece is a white pawn
