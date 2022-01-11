@@ -77,12 +77,10 @@ def main():
                     move_made = True    #sets flag variable to true in order to generate a new set of valid moves
                     square_selected = ()    #reset user clicks
                     player_clicks = []      #resets user clicks
-                    
+
         if move_made:   #once a move has been made, generate a new set of valid moves
             valid_moves = game_state.get_valid_moves()
             move_made = False
-
-
 
 
         draw_game_state(screen, game_state) #calls draw_game_state to draw the current state
