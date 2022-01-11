@@ -232,21 +232,84 @@ class Game_State:
                         self.get_king_moves(r, c, moves)
         return moves
 
-    def get_pawn_moves(self, row, column, moves):
-        #figure this out later and copy-paste evan's code
-        pass
+    def get_pawn_moves(self, row, column, moves):   #gets all possible moves for the pawns. Copy-paste evan's code with some slight modifications
+        if self.is_white_turn:  #limits out to just look at the white pawn moves
 
-    def get_rook_moves(self, row, column, moves):
-        #figure this out later and copy-paste evan's code
-        pass
+            #one square move
+            if(row > 0 and self.board[row-1][column] == "--"):  #if white pawn has not reached the end of the board and if square in front of pawn is empty
+                moves.append(Move((row, column), (row - 1, column), self.board))    #creates a new move object, up 1 square, adds it to the list of moves
+                #two square move
+                if(row == 6 and self.board[row-2][column] == "--"): #if white pawn is on sixth row (can move two squares) and square two in front of pawn is empty
+                    moves.append(Move((row, column), (row-2, column), self.board))  #adds a new 2 square move to the list of moves
+            #captures to the left
+            if(column > 0): #if pawn is not on the left-most file
+                if(self.board[row - 1][column - 1][0] == 'b'):  #if square diagonally upwards and to the left contains a black piece
+                    moves.append(Move((row, column), (row - 1, column - 1), self.board))   #adds a new diagonal capture to the list of moves   
+            #captures to the right
+            if(column < 7): #if pawn is not on right-most file
+                if(self.board[row-1][column+1][0] == 'b'): #if square diagonally upwards and to the right contains a black piece
+                    moves.append(Move((row, column), (row - 1, column + 1), self.board))    #adds a new diagonal capture to the list of moves
+        
+        else:   #black pawn moves
+            #one-square moves
+            if(row < 7 and self.board[row + 1][column] == "--"):  #if black pawn has not reached the end of the board and if square in front of pawn is empty
+                moves.append(Move((row, column), (row + 1, column), self.board))    #creates a new move object, up 1 square, adds it to the lsit of moves
+                #two square moves
+                if(row == 1 and self.board[row + 2][column] == "--"):   #if black pawn is on first row (can move two squares) and square two in front of pawn is empty
+                    moves.append(Move((row, column), (row + 2, column), self.board))    #adds a new 2 square move to the list of moves
+            #captures to the left
+            if(column > 0):     #if pawn is not on the left-most file
+                if(self.board[row + 1][column - 1][0] == 'w'):  #if square diagonally downwards and to the left contains a white piece
+                    moves.append(Move((row, column), (row + 1, column - 1), self.board))
+            #captures to the right
+            if(column < 7): #if pawn is not on the right-most file
+                if(self.board[row + 1][column + 1][0] == 'w'):      #if square diagonally downwards and to the right contains a white piece
+                    moves.append(Move((row, column), (row + 1, column + 1), self.board))    #adds a new diagonal capture to the list of moves
+
+    def get_rook_moves(self, row, column, moves):   #gets all possible moves for the rook. Copy and paste evan's code with some slight mdifications
+        #Note: unlike pawn moves, the color of the rook does not affect its movement possibilities
+
+        directions = ((-1, 0), (1, 0), (0, -1), (0, 1)) #basis vectors for directions: up, down, left, right
+        if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
+            enemy_color = 'b'
+        else:
+            enemy_color = 'w'
+        
+        for direction in directions:    #iterates through the directions: up, down, left, right
+            for i in range(1, 8):   #iterates from 1 to 8
+                end_row = row + direction[0] * i       #sets the end row to be the start row PLUS i rows up or down. If the direction is (0, -1) or (0, 1), aka left or right, direction[0] will be zero and the row index will not change.
+                end_column = column + direction[1] * i     #sets the end column to be start column PLUS i columns left or right. If the direction is (-1, 0) or (1, 0), aka up or down, direction[1] will be zero and the column index will not change.
+                if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
+                    if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                        moves.append(Move((row, column), (end_row, end_column), self.board))    #add that move to the list of moves
+                    elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains a piece of enemy color
+                        moves.append(Move((row, column), (end_row, end_column), self.board))    #add that move to the list of moves
+                        break   #break the inner for loop (the one with i) -- now that the rook has hit a piece, it can't go any further in this direction. Break tells the computer iterate to the next available direction
+                    else:       #if the square is a friendly piece
+                        break   #break the inner for loop for the same reasons as above
+                else: #else off board
+                    break   #go to the next direction
 
     def get_queen_moves(self, row, column, moves):
         #figure this out later and copy-paste evan's code
         pass
 
     def get_knight_moves(self, row, column, moves):
-        #figure this out later and copy-paste evan's code
-        pass
+        directions = ((-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2))   #tuple in form (row, column). up/left, up/right, down/left, down/right, left/up, right/up, left/down, right/down
+        if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
+            enemy_color = 'b'
+        else:
+            enemy_color = 'w'
+        
+        for direction in directions:
+            end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
+            end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
+        if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
+            if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+            elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
+                moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+    
 
     def get_bishop_moves(self, row, column, moves):
         #figure this out later and copy-paste evan's code
@@ -296,9 +359,6 @@ class Move():
         if isinstance(other, Move): #if "other" object is an instance of the Move class
              return self.moveID == other.moveID #returns true if two move IDs are the same, and false if they are different.
         return False
-
-
-
 
     #conversion method from matrix notation to chess notation (e.g. [6, 4] would become ["e", "3"]). I'm lazy. That's why this exists.
     def get_chess_notation(self):
