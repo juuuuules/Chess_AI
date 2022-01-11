@@ -291,8 +291,8 @@ class Game_State:
                     break   #go to the next direction
 
     def get_queen_moves(self, row, column, moves):  #gets all possible moves for the queen. Queen is literally rook + bishop tho lol
-        self.get_rook_moves(self, row, column, moves)   #gets all possible rook moves
-        self.get_bishop_moves(self, row, column, moves) #gets all possible queen moves
+        self.get_rook_moves(row, column, moves)   #gets all possible rook moves
+        self.get_bishop_moves(row, column, moves) #gets all possible queen moves
 
     def get_knight_moves(self, row, column, moves): #gets all possible moves for the knight
         directions = ((-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2))   #tuple in form (row, column). up/left, up/right, down/left, down/right, left/up, right/up, left/down, right/down
