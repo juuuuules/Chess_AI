@@ -337,6 +337,11 @@ class Game_State:
     def get_king_moves(self, row, column, moves):   #gets all possible moves for the king
         #other than the direction vectors, this method is literally the same as the knight moves method
         directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)) #possible king moves: up/left, up, up/right, left, right, down/left, down, down/right
+        if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
+            enemy_color = 'b'
+        else:
+            enemy_color = 'w'
+        
         for direction in directions:    #iterates over all the directions
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
             end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
