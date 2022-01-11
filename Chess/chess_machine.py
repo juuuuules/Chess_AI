@@ -290,18 +290,18 @@ class Game_State:
                 else: #else off board
                     break   #go to the next direction
 
-    def get_queen_moves(self, row, column, moves):
+    def get_queen_moves(self, row, column, moves):  #gets all possible moves for the queen
         #figure this out later and copy-paste evan's code
         pass
 
-    def get_knight_moves(self, row, column, moves):
+    def get_knight_moves(self, row, column, moves): #gets all possible moves for the knight
         directions = ((-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2))   #tuple in form (row, column). up/left, up/right, down/left, down/right, left/up, right/up, left/down, right/down
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
             enemy_color = 'b'
         else:
             enemy_color = 'w'
         
-        for direction in directions:
+        for direction in directions:    #iterates over all the directions
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
             end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
             if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
@@ -311,14 +311,40 @@ class Game_State:
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
     
 
-    def get_bishop_moves(self, row, column, moves):
-        #figure this out later and copy-paste evan's code
-        pass
+    def get_bishop_moves(self, row, column, moves): #gets all possible moves for the bishop
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))   #unit vectors for the diagonals: up/left, up/right, down/left, down/right
+        if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
+            enemy_color = 'b'
+        else:
+            enemy_color = 'w'
 
-    def get_king_moves(self, row, column, moves):
-        #figure this out later and copy-paste evan's code
-        pass
+        for direction in directions: #iterates over all the directions
+            for i in range(1, 8):
+                end_row = row + direction[0] * i    #same as for the rook. sets the end row to be the start row PLUS i rows up or down.
+                end_column = column + direction [1] * i #sets the end column to be the start column PLUS i columns up or down
+                if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
+                    if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                        moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+                    elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
+                        moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to move list
+                        break   #same as for the Rook. Break the inner for loop to go to a new direction, now that the current diagonal has been found to be blocked off by a piece
+                    else: #friendly piece
+                        break   #break inner loop for same reason. Diagonal is blocked off. Tells computer to go to new direction.
+                else: #off board
+                    break
+    
 
+    def get_king_moves(self, row, column, moves):   #gets all possible moves for the king
+        #other than the direction vectors, this method is literally the same as the knight moves method
+        directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)) #possible king moves: up/left, up, up/right, left, right, down/left, down, down/right
+        for direction in directions:    #iterates over all the directions
+            end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
+            end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
+            if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
+                if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                    moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+                elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
+                    moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
 
 
 
