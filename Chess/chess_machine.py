@@ -304,11 +304,11 @@ class Game_State:
         for direction in directions:
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
             end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
-        if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-            if(self.board[end_row][end_column] == "--"):    #if ending square is empty
-                moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
-            elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
-                moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+            if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
+                if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                    moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+                elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
+                    moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
     
 
     def get_bishop_moves(self, row, column, moves):

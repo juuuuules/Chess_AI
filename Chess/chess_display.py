@@ -75,7 +75,9 @@ def main():
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
                     game_state.undo_move()  #calls undo move
                     move_made = True    #sets flag variable to true in order to generate a new set of valid moves
-
+                    square_selected = ()    #reset user clicks
+                    player_clicks = []      #resets user clicks
+                    
         if move_made:   #once a move has been made, generate a new set of valid moves
             valid_moves = game_state.get_valid_moves()
             move_made = False
