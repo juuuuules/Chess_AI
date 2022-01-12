@@ -19,7 +19,6 @@ def load_images():
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
     #Note: Use  ' IMAGES['wP'] '  to access an image
-
     
 #Main method - handles user input, updates graphics
 def main():
@@ -35,6 +34,7 @@ def main():
     load_images()   #calls load_images method - we only do it once to conserve computing time
     square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
     player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
+    piece_dragging = False
 
     #Run until user asks to quit
     running = True
@@ -49,14 +49,14 @@ def main():
                 location = p.mouse.get_pos() #gets the (x, y) location of mouse
                 col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
                 row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
-                
-                #check if square is ALREADY SELECTED
+
+               #check if square is ALREADY SELECTED
                 if square_selected == (row, col):        #the user clicked the same square twice
-                    square_selected = ()        #deselect
-                    player_clicks = []  #clear player_clicks
+                   square_selected = ()        #deselect
+                   player_clicks = []  #clear player_clicks
                 else:
-                    square_selected = (row, col) #stores location of click in square_selected variable
-                    player_clicks.append(square_selected) #adds the location of the click to the list 
+                   square_selected = (row, col) #stores location of click in square_selected variable
+                   player_clicks.append(square_selected) #adds the location of the click to the list 
 
                 #was that the second click?
                 if len(player_clicks) == 2:     #after the second click
@@ -135,10 +135,6 @@ def highlight_squares(screen, game_state, valid_moves, square_selected): #Highli
             screen.blit(selected_square_highlighting, (column * SQ_SIZE, row * SQ_SIZE))
             #highlight valid moves from that square
             
-
-
-
-
 
 #Draw pieces on the board using current game_state.board
 def draw_pieces(screen, board):
