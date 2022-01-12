@@ -83,7 +83,7 @@ def main():
             move_made = False
 
 
-        draw_game_state(screen, game_state) #calls draw_game_state to draw the current state
+        draw_game_state(screen, game_state, valid_moves, square_selected) #calls draw_game_state to draw the current state
 
 
 
@@ -93,10 +93,9 @@ def main():
 
 
 #Method responsible for all the graphics within a current game state
-def draw_game_state(screen, game_state):
+def draw_game_state(screen, game_state, valid_moves, square_selected):
     draw_board(screen) #draw squares on the board
-
-    #maybe add in piece highlighting / move suggestions later?
+    highlight_squares(screen, game_state, valid_moves, square_selected)
 
     draw_pieces(screen, game_state.board) #draw pieces on top of squares
 
@@ -109,7 +108,36 @@ def draw_board(screen):
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #draws a colored rectangle beginning at c*SQ_SIZE and r*SQ_SIZE with dimmensions SQ_SIZE * SQ_SIZE
 
 
-#def highlight_squares(screen, game_state, valid_moves, square_selected): #FOR LATER
+def highlight_squares(screen, game_state, valid_moves, square_selected): #Highlights square selected. Highlights valid moves for piece selected
+    
+    #highlight last move
+    if(len(game_state.move_log) > 0):
+            last_move = game_state.move_log[-1]
+            start_square = p.Surface((SQ_SIZE, SQ_SIZE))    #creates a new surface object of size sq_size * sq_size so that the highlighted start sqaure and end square of the previous move will be blitted onto the screen later
+            start_square.set_alpha(100)
+            start_square.fill(p.Color("blue"))
+            end_square = p.Surface((SQ_SIZE, SQ_SIZE))
+            end_square.set_alpha(100)
+            end_square.fill(p.Color("blue"))
+            screen.blit(start_square, (last_move.start_col * SQ_SIZE, last_move.start_row * SQ_SIZE))
+            screen.blit(end_square, (last_move.end_col * SQ_SIZE, last_move.end_row * SQ_SIZE))
+
+
+    if square_selected != ():   #if square selected is not an empty tuple
+        row = square_selected[0]    #sets row to be x coordinate of the tuple
+        column = square_selected[1] #sets column to be y coordinate of the tuple
+
+        #highlight selected square
+        if( (game_state.board[row][column][0] == 'w' and game_state.is_white_turn == True) or (game_state.board[row][column][0] == 'b' and game_state.is_white_turn == False) ):  #if color of piece matches who's turn it is
+            selected_square_highlighting = p.Surface((SQ_SIZE, SQ_SIZE))    #creates a new surface object of size square_size
+            selected_square_highlighting.set_alpha(100) #sets transparency value. 0 = transparent, 255 = opaque. Thanks stack exchange!
+            selected_square_highlighting.fill(p.Color("blue"))
+            screen.blit(selected_square_highlighting, (column * SQ_SIZE, row * SQ_SIZE))
+            #highlight valid moves from that square
+            
+
+
+
 
 
 #Draw pieces on the board using current game_state.board
