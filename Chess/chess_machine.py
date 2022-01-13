@@ -24,14 +24,9 @@ class Game_State:
 
         self.valid_moves = []
 
-#        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
-
-        
-    #overriding the equals method
- #   def __eq__(self, other):
-  #      if isinstance(other, Move):
-   #         return self.moveID == other.moveID
-    #    return False
+        #i couldn't figure out how to deal with checks, so i decided to just keep track of kings location. Also should help w castling
+        self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
+        self.black_king_location = (0, 4)   #black king starts at row 0 col 4
 
     def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
         self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
