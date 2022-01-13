@@ -27,6 +27,9 @@ class Game_State:
         #i couldn't figure out how to deal with checks, so i decided to just keep track of kings location. Also should help w castling
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
         self.black_king_location = (0, 4)   #black king starts at row 0 col 4
+        self.is_checkmate = False
+        self.in_check = False
+
 
     def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
         self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
@@ -41,8 +44,21 @@ class Game_State:
             self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made
             self.board[move.end_row][move.end_col] = move.piece_captured    #sets the end row and column of the move back to what it was before the move was made
             self.is_white_turn = not self.is_white_turn #changes turn
-            
 
+    def square_under_attack(self, row, column):   #determines whether an enemy can attack the square row / col
+        self.is_white_turn = not self.is_white_turn #looks at opponents moves
+        opponent_moves = self.get_possible_moves_MODIFIED
+        self.is_white_turn = not self.is_white_turn #switches back perspective
+        for move in opponent_moves:
+            if (move.end_row == row and move.end_column  == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
+                return True
+        return False
+
+    def in_check(self):
+        if self.is_white_turn:
+            return self.square_under_attack(self.white_king_locatiion[0], self.white_king_location[1])
+        else:
+            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])
 
     def piece_at_coordinates(self, row, column):
         return self.board[row][column]
@@ -341,7 +357,7 @@ class Game_State:
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
             end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
             if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-                if(self.board[end_row][end_column] == "--"):    #if ending square is empty
+                if(self.board[end_row][end_column] == "--"):    #if ending square is empty                 
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
                 elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
@@ -396,3 +412,4 @@ class Move():
 
 
 
+print("wrong file bozo")
