@@ -145,38 +145,55 @@ class Game_State:
         #add to the solution variable all the possible moves if the piece is a rook
         if(piece[1] == "R"):
             #code to determine all spots above the rook that are valid moves
-            keepLooping = True
-            indexVariable = 1
+            keepLooping = True #will stay true while the computer is iterating through spots above the rook
+            indexVariable = 1 #will increase to indicate higher squares above the rook
 
-            while(keepLooping):
-                if(row - indexVariable >= 0):
-                    if(self.piece_at_coordinates(self, row - indexVariable, column) == "--"):
-                        self.possible_moves += [row - indexVariable, column]
+            while(keepLooping): #initiates the loop to check for valid moves above rook
+                if(row - indexVariable >= 0): #checks if the new possible move is above the board
+                    #if row - indexVariable is less than 0, then the space in question is above the top row
+
+                    if(self.piece_at_coordinates(self, row - indexVariable, column) == "--"): #this checks if the space in question is an empty square
+                        self.possible_moves += [row - indexVariable, column] #adds the square in question to the list of valid moves
                     elif(self.piece_at_coordinates(self, row - indexVariable, column)[0] == self.piece_at_coordinates(self, row, column)[0]):
-                        keepLooping = False
-                    elif(self.piece_at_coordinates(self, row - indexVariable, column)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        self.possible_moves += [row - indexVariable, column]
-                        keepLooping = False
+                        #^^^ this checks if the piece at the square in question is the same color as the selected piece
+
+                        keepLooping = False #if so it will end the loop since clearly a rook can't move through another piece of the same color
+
+                    elif(self.piece_at_coordinates(self, row - indexVariable, column)[0] != self.piece_at_coordinates(self, row, column)[0]): 
+                        #this checks if the square in question has a an opponents piece on it
+
+                        self.possible_moves += [row - indexVariable, column] #this adds this square as a possible move
+                        keepLooping = False #but it also ends the loop since you a rook can only take an enemy piece, not move through it
                 else:
-                    keepLooping = False
-                indexVariable += 1
+                    keepLooping = False #this makes sure that if the square in question (IE the possible move) is outside the board, the loop will end
+                indexVariable += 1 #increases the indexVariable to look at the next square above the previous one
 
             #code to determine all spots below the rook that are valid moves
-            keepLooping = True
-            indexVariable = 1
+            #basically everything below this point is copy pasted from above but changing the parameters to represent square going to -->
+            #the left, going to the right, or going down
+            keepLooping = True #again setting loopig variable to true. setting this to false indicates that -->
+            #any square beneath the selected one is invalid
 
-            while(keepLooping):
-                if(row + indexVariable <= 7):
-                    if(self.piece_at_coordinates(self, row + indexVariable, column) == "--"):
-                        self.possible_moves += [row + indexVariable, column]
+            indexVariable = 1 #again set the index variable to 1
+
+            while(keepLooping): #start the loop
+                if(row + indexVariable <= 7): #if the square in question is below the board (as in the square selected by indexVariable -->
+                    #has a row of 8 or more) then it prevents the loop from continuing
+                    
+                    if(self.piece_at_coordinates(self, row + indexVariable, column) == "--"): #checks if the square in question is blank
+                        self.possible_moves += [row + indexVariable, column] #if so adds that square to the list of valid moves
                     elif(self.piece_at_coordinates(self, row + indexVariable, column)[0] == self.piece_at_coordinates(self, row, column)[0]):
-                        keepLooping = False
+                        #^^^otherwise checks if the square in question is on the same side as the selected piece
+
+                        keepLooping = False #if so it ends the loop since rooks can't phase through pieces
                     elif(self.piece_at_coordinates(self, row + indexVariable, column)[0] != self.piece_at_coordinates(self, row, column)[0]):
-                        self.possible_moves += [row + indexVariable, column]
-                        keepLooping = False
+                        #^^^checks if the piece at the square in question is an enemy piece
+
+                        self.possible_moves += [row + indexVariable, column] #adds that square to the list of valid moves
+                        keepLooping = False #prevents any other squares below that square from being added to valid moves
                 else:
-                    keepLooping = False
-                indexVariable += 1
+                    keepLooping = False #ends the loop since if this code is being run that means row + indexVariable >= 8 and is outside the board
+                indexVariable += 1 #add one to the index variable to keep the jazz vibing
             
             #code to determine all spots left of the rook that are valid moves
             keepLooping = True
