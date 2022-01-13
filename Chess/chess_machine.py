@@ -322,8 +322,8 @@ class Move():
         self.end_row = end_square[0]        #same thing, but for end_row
         self.end_col = end_square[1]        #same thing, but for end_col
 #--------------------------------------------
-        self.piece_moved = self.board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
-        self.piece_captured = self.board[self.end_row][self.end_col]     #gets the piece located on the board at the ending square. This is the piece that is captured by any given move. Might end up being "--".
+        self.piece_moved = board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
+        self.piece_captured = board[self.end_row][self.end_col]     #gets the piece located on the board at the ending square. This is the piece that is captured by any given move. Might end up being "--".
         self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col   #gives each move a unique move id between 0 and 7777. Useful when comparing whether two moves are equal.
 #--------------------------------------------
 
