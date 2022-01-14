@@ -28,6 +28,7 @@ class Game_State:
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
         self.black_king_location = (0, 4)   #black king starts at row 0 col 4
         self.is_checkmate = False
+        self.is_stalemate = False
         self.in_check = False
 
 
@@ -94,9 +95,17 @@ class Game_State:
             self.is_white_turn = not self.is_white_turn
             self.undo_move()    #undoes each move as it occurs. Reminder: undo_move deletes the last move in the move log
 
-
-
-        return self.get_possible_moves_MODIFIED()
+        if len(moves) == 0: #after the filtering algorithm, if there are zero legal moves, then it is either checkmate or stalemate
+            if self.in_check(): #if in check
+                self.is_checkmate = True    #then it's checkmate
+            else:   #if its not check  
+                self.is_stalemate = True    #then it's stalemate
+        else:
+            self.is_checkmate = False
+            self.is_stalemate = False   #sets checkmate and stalemate to be false, just in case we undo a move that causes checkmate/stalemate. 
+        
+        
+        return moves
 
     #looks at the whole board, and generates all the possible moves that a given side can make. This includes pieces moving while pinned, kings moving into check, etc.
     def get_possible_moves_MODIFIED(self):
