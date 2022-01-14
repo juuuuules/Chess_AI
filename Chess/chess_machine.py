@@ -37,7 +37,7 @@ class Game_State:
         self.move_log.append(move)  #logs the move -- adds it to move log at the end of the log
         self.is_white_turn = not self.is_white_turn #changes turn from white to black or vice versa
         
-        #updates the king position if moved
+        #updates the king position if king is movedmoved
         if(move.piece_moved == 'wK'):   #if white king is moved
             self.white_king_location = (move.end_row, move.end_col) #set white king location to the end square of the king move
         elif (move.piece_moved == 'bK'):
@@ -51,7 +51,7 @@ class Game_State:
             self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made
             self.board[move.end_row][move.end_col] = move.piece_captured    #sets the end row and column of the move back to what it was before the move was made
             self.is_white_turn = not self.is_white_turn #changes turn
-        #updates the king position if moved
+        #updates the king position if king is moved
         if(move.piece_moved == 'wK'):   #if white king is moved
             self.white_king_location = (move.start_row, move.start_col) #set white king location back to the start square of the king move
         elif (move.piece_moved == 'bK'):
@@ -68,101 +68,34 @@ class Game_State:
                 return True
         return False
 
+    #checks to see whether king is in check
     def in_check(self):
-        if self.is_white_turn:
-            return self.square_under_attack(self.white_king_locatiion[0], self.white_king_location[1])
-        else:
-            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])
-
-    def piece_at_coordinates(self, row, column):
-        return self.board[row][column]
-
-
-    #return an array of all possible moves for the piece at the inputed square
-    #the array will be 2 dimensional, and each element in the array will be an array of length 2 with the row and column 
-    #of a square that the inputed piece can move to
-
-    #EVAN, IMO WE SHOULD MAKE DIFFERENT METHODS BASED ON PAWNS, ROOK, NIGHT, BISHOP, ETC. SO WE WOULD HAVE get_pawn_moves, get_bishop_moves, etc.
-    # THEN, WE COULD CREATE A MAP AT THE TOP THAT SAYS SOMETHING LIKE {"P": self. get_pawn_moves, "R": self.get_rook_moves, etc}.
-    # THEN, the get_valid_moves method would just call the appropriate getter method depending on the given piece at the location.
-    # Makes it much easier to read and less computationally intensive, bc the computer doesn't have to read a ton of if statements many times per frame 
-    
-    #also, i changed the name to get_possible_moves, because we should have a SEPARATE function that considers checks. I.e. a pawn cannot move if it is pinned
-    def get_possible_moves(self, row, column):
-        possible_moves = []
-        piece = self.piece_at_coordinates(self, row, column)
-        
-        #add to the solution variable all the possible moves if the piece is a white pawn
-        if(piece == "wP"): #checks to see if the selected square has a white pawn
-
-            #this basically says: if the white pawn is below the first row (as in it hasn't moved to the end of the board),
-            #and if the piece at the square directly in front of the pawn is empty,
-            #than say that the square directly in front of the pawn is a possible move (by adding that square to the solution array)
-            if(row > 0 and self.piece_at_coordinates(self, row - 1, column) == "--"): 
-                self.possible_moves += [row - 1, column]
-
-                #this if statements adds an extra scenario where, if the pawn is on it's starting row, it can move 2 pieces forward
-                #so long as the square 2 pieces forward is empty
-                if(row == 6 and self.piece_at_coordinates(self, row - 2, column) == "--"):
-                    self.possible_moves += [row - 2, column]
-
-            #this collection of if statements adds the possibility of the pawn moving diagonally to the solution array
-            #it says, if the pawn is not on the 0th row
-
-            #than if the piece one up and one to the left of the selected pawn is black,
-            if(column > 0 and self.piece_at_coordinates(self, row - 1, column - 1)[0] == "b"):
-                #than allow that move to be added to the solution array
-                self.possible_moves += [row - 1, column - 1]
-
-            #alternatively, if the piece one up and to the right of the selected pawn is black,
-            if(column < 7 and self.piece_at_coordinates(self, row - 1, column + 1)[0] == "b"):
-                    #than add the square one up and to the right of the selected pawn to the solution array
-                    self.possible_moves += [row - 1, column + 1]
-        
-        #this adds to the solution variable all the possible moves if the piece is a black pawn
-        #this basically works the same as the previous collection of if statements
-        #the only difference is that the - signs become + signs since the pawns are moving down the board not up it
-        #also instead of checking if the pawn is on a square greater than 0 it will check if it is on one less than 7
-        if(piece == "bP"): #checks to see if piece is black pawn
-
-            #checks to see if pawn is not on the last row and if so, if the square in front of the pawn is empty
-            if(row < 7 and self.piece_at_coordinates(self, row + 1, column) == "--"):
-
-                #adds the square in front of the pawn to the solution array of possible moves
-                self.possible_moves += [row + 1, column]
-
-                #adds the extra check to see if the pawn is on it's starting row and if so, if it can move 2 forward
-                #it checks to see if the square 2 in front of the pawn is empty
-                if(row == 1 and self.piece_at_coordinates(self, row + 2, column)[0] == "--"): 
-
-                    #adds the option to move 2 forward to the solution array
-                    self.possible_moves += [row + 2, column]
-
-            #this adds the possibility of the pawn moving diagnally to take other pieces
-
-            #checks if the piece one below and one to the left of the pawn is white
-            if(column > 0 and self.piece_at_coordinates(self, row + 1, column - 1)[0] == "w"):
-
-                    #if so it adds that square (one down and one to the left) to the solution array of possible moves
-                    self.possible_moves += [row + 1, column - 1]
-
-                #checks if the piece one below and one to the right of the pawn is white
-            if(self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
-                #if so it adds that square (one below and one to the right) to the solution array of possible moves
-                self.possible_moves += [row + 1, column + 1]
-
-            #checks if the piece one below and one to the right of the pawn is white
-            if(column < 7 and self.piece_at_coordinates(self, row + 1, column + 1)[0] == "w"):
-                #if so it adds that square (one below and one to the right) to the solution array of possible moves
-                self.possible_moves += [row + 1, column + 1]
+        if self.is_white_turn:  #if it's white to move
+            return self.square_under_attack(self.white_king_locatiion[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
+        else:   #if black to move
+            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])   #checks whether the black king's location is being attacked
 
     #of the possible moves that can occur, filters out the ones that would result in a check
     def get_valid_moves(self):
         #Pseudo code:
         # 1 - get all possible moves. Calls the get_possible_moves method.
-        # 2 - generates all moves for the OPPOSING player
-        # 3 - sees if any of those moves attacks king
-        # 4 - if and only if the king is safe, add that element of possible_moves[] to valid_moves[]
+        # 2 - Make each move. 
+        # 3 - For each move, generates all moves for the OPPOSING player, and sees whether any of them will result in the king being threatened
+        # 4 - sees if any of those moves attacks king
+        # 5 - if it does, remove it from the list.
+        moves = self.get_possible_moves_MODIFIED
+        for i in range(len(moves) - 1, -1, -1): #iterates through the moves list backwards. Starts at last index, goes until just before -1 index, over increments of -1. We go backwards to avoid list reindexing when removing things
+            self.make_move(moves[i])    #makes each move.
+            self.is_white_turn = not self.is_white_turn #IMPORTANT: the make_move function switches turns automatcically. If this line didn't exist, we'd be looking at the wrong player's king
+            if self.in_check(): #if move puts king in check, then it's not a valid move
+                moves.remove(moves[i])  #remove the move at index i
+
+            #now we need to undo our algorithm so that the moves made dont actually occur on the board
+            self.is_white_turn = not self.is_white_turn
+            self.undo_move()    #undoes each move as it occurs. Reminder: undo_move deletes the last move in the move log
+
+
+
         return self.get_possible_moves_MODIFIED()
 
     #looks at the whole board, and generates all the possible moves that a given side can make. This includes pieces moving while pinned, kings moving into check, etc.
