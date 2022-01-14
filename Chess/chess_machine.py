@@ -29,7 +29,6 @@ class Game_State:
         self.black_king_location = (0, 4)   #black king starts at row 0 col 4
         self.is_checkmate = False
         self.is_stalemate = False
-        self.in_check = False
 
 
     def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
@@ -57,22 +56,26 @@ class Game_State:
             self.white_king_location = (move.start_row, move.start_col) #set white king location back to the start square of the king move
         elif (move.piece_moved == 'bK'):
             self.black_king_location = (move.start_row, move.start_col) #set black king location back to the start square of the king move
+      
+        self.is_checkmate = False
+        self.is_stalemate = False   #sets checkmate and stalemate to be false, just in case we undo a move that causes checkmate/stalemate. 
+        
 
 
 
     def square_under_attack(self, row, column):   #determines whether an enemy can attack the square row / col
         self.is_white_turn = not self.is_white_turn #looks at opponents moves
-        opponent_moves = self.get_possible_moves_MODIFIED
+        opponent_moves = self.get_possible_moves_MODIFIED()
         self.is_white_turn = not self.is_white_turn #switches back perspective
         for move in opponent_moves:
-            if (move.end_row == row and move.end_column == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
+            if (move.end_row == row and move.end_col == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
                 return True
         return False
 
     #checks to see whether king is in check
     def in_check(self):
         if self.is_white_turn:  #if it's white to move
-            return self.square_under_attack(self.white_king_locatiion[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
+            return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
         else:   #if black to move
             return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])   #checks whether the black king's location is being attacked
 
@@ -84,8 +87,8 @@ class Game_State:
         # 3 - For each move, generates all moves for the OPPOSING player, and sees whether any of them will result in the king being threatened
         # 4 - sees if any of those moves attacks king
         # 5 - if it does, remove it from the list.
-        moves = self.get_possible_moves_MODIFIED
-        for i in range(len(moves) - 1, -1, -1): #iterates through the moves list backwards. Starts at last index, goes until just before -1 index, over increments of -1. We go backwards to avoid list reindexing when removing things
+        moves = self.get_possible_moves_MODIFIED()
+        for i in range(len(moves)-1, -1, -1): #iterates through the moves list backwards. Starts at last index, goes until just before -1 index, over increments of -1. We go backwards to avoid list reindexing when removing things
             self.make_move(moves[i])    #makes each move.
             self.is_white_turn = not self.is_white_turn #IMPORTANT: the make_move function switches turns automatcically. If this line didn't exist, we'd be looking at the wrong player's king
             if self.in_check(): #if move puts king in check, then it's not a valid move
@@ -100,11 +103,7 @@ class Game_State:
                 self.is_checkmate = True    #then it's checkmate
             else:   #if its not check  
                 self.is_stalemate = True    #then it's stalemate
-        else:
-            self.is_checkmate = False
-            self.is_stalemate = False   #sets checkmate and stalemate to be false, just in case we undo a move that causes checkmate/stalemate. 
-        
-        
+
         return moves
 
     #looks at the whole board, and generates all the possible moves that a given side can make. This includes pieces moving while pinned, kings moving into check, etc.
