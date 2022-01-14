@@ -36,6 +36,13 @@ class Game_State:
         self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
         self.move_log.append(move)  #logs the move -- adds it to move log at the end of the log
         self.is_white_turn = not self.is_white_turn #changes turn from white to black or vice versa
+        
+        #updates the king position if moved
+        if(move.piece_moved == 'wK'):   #if white king is moved
+            self.white_king_location = (move.end_row, move.end_col) #set white king location to the end square of the king move
+        elif (move.piece_moved == 'bK'):
+            self.black_king_location = (move.end_row, move.end_col) #set black king location to the end square of the king move
+
 
     def undo_move(self):    #function that undoes last move
         if len(self.move_log) != 0: #checks to see whether there is a move to undo
@@ -44,6 +51,13 @@ class Game_State:
             self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made
             self.board[move.end_row][move.end_col] = move.piece_captured    #sets the end row and column of the move back to what it was before the move was made
             self.is_white_turn = not self.is_white_turn #changes turn
+        #updates the king position if moved
+        if(move.piece_moved == 'wK'):   #if white king is moved
+            self.white_king_location = (move.start_row, move.start_col) #set white king location back to the start square of the king move
+        elif (move.piece_moved == 'bK'):
+            self.black_king_location = (move.start_row, move.start_col) #set black king location back to the start square of the king move
+
+
 
     def square_under_attack(self, row, column):   #determines whether an enemy can attack the square row / col
         self.is_white_turn = not self.is_white_turn #looks at opponents moves
