@@ -247,19 +247,18 @@ class Game_State:
     def get_king_moves(self, row, column, moves):   #gets all possible moves for the king
         #other than the direction vectors, this method is literally the same as the knight moves method
         directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)) #possible king moves: up/left, up, up/right, left, right, down/left, down, down/right
-        if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
-            enemy_color = 'b'
+        if self.is_white_turn:  #sets the ally color. If it's white to move, ally color is white. Otherwise, it's black.
+            ally_color = 'w'
         else:
-            enemy_color = 'w'
+            ally_color = 'b'
         
         for direction in directions:    #iterates over all the directions
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
             end_column = column + direction[1]  #sets the end column to be start column + second term of a particular direction
             if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-                if(self.board[end_row][end_column] == "--"):    #if ending square is empty                 
+                if(self.board[end_row][end_column] != ally_color):    #if ending square does not contain a piece of the allied color                 
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
-                elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
-                    moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
+            
 
         self.get_castle_moves(self, row, column, moves, ally_color) #WORK ON THIS LATER
 
@@ -291,7 +290,8 @@ class Game_State:
                 elif(move.start_col == 7): #right rook
                     self.current_castle_rights.white_kingside_castle = False
 
-
+    def get_castle_moves(self, row, column, moves, ally_color):
+        pass
 
 #Castling Rights class. Creates objects with 4 boolean parameters indicating whether/how white and black can castle.
 #Several rules must be taking into account:
