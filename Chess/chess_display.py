@@ -10,7 +10,7 @@ WIDTH = HEIGHT = 1000   #sets width and height of display to 1000x1000 pixels
 DIMENSION = 8 #dimensions are 8x8
 SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 #Do we need MAX_FPS variable?????
-IMAGES = {} #Creates a global images directort
+IMAGES = {} #Creates a global images directory
 
 
 #Method that initializes a global directory of images. Minimize calling this method bc it takes a lot of computing time lol
