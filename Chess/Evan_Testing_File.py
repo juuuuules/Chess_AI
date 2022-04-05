@@ -1,15 +1,30 @@
-#123454321
+import pygame
 
-print("hello world")
+import os
 
-i=0
-while i < 15:
-    print(i)
-    i = i + 1
-for i in range(1, 10):
-    print(i)
+pygame.init()
 
-print("reeeeeeeeeeeeeeeeeeeeee")
+screen = pygame.display.set_mode((500, 500))
 
-print("evan is jezus")
-print("julien")
+screen.fill((255, 255, 255))
+
+while True:
+
+    screen.fill((255, 255, 0))
+
+    n = 0
+
+    for file in os.scandir("../images"):
+        if file.is_file():
+            image = pygame.image.load(file.path)
+
+            screen.blit(image, (n, n))
+        n += 40
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+
+    pygame.display.update()
