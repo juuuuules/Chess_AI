@@ -4,6 +4,7 @@
 import pygame as p
 from pygame.constants import KEYDOWN, K_z
 import chess_machine
+import os
 
 p.init()        #initializes pygame
 WIDTH = HEIGHT = 1000   #sets width and height of display to 1000x1000 pixels 
@@ -17,7 +18,10 @@ IMAGES = {} #Creates a global images directory
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
+        if not os.path.isdir("images"): #this if statement makes it so that the images are loaded regardless of which directory we're running this file in
+            IMAGES[piece] = p.transform.scale(p.image.load("../images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
+        else:
+            IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
     #Note: Use  ' IMAGES['wP'] '  to access an image
     
 #Main method - handles user input, updates graphics
