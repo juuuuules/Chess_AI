@@ -7,7 +7,11 @@ import chess_machine
 import os
 
 p.init()        #initializes pygame
-WIDTH = HEIGHT = 1000   #sets width and height of display to 1000x1000 pixels 
+if not os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
+    #this works because on Evan's computer the images directory is not in the directory chess_display is running in
+    WIDTH = HEIGHT = 700   #sets width and height of display to 700x700 pixels if it's Evan's laptop
+else:
+    WIDTH = HEIGHT = 1000  #sets width and height of display to 1000x1000 pixels if it's Julien's laptop
 DIMENSION = 8 #dimensions are 8x8
 SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 #Do we need MAX_FPS variable?????
@@ -18,7 +22,7 @@ IMAGES = {} #Creates a global images directory
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        if not os.path.isdir("images"): #this if statement makes it so that the images are loaded regardless of which directory we're running this file in
+        if not os.path.isdir("images"): #this if statement makes it so that the images are loaded regardless of which directory we're running chess_display.py in
             IMAGES[piece] = p.transform.scale(p.image.load("../images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
         else:
             IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
@@ -33,6 +37,7 @@ def main():
     game_state = chess_machine.Game_State() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
     valid_moves = game_state.get_valid_moves()  #greates a list of valid moves by calling the get_valid_moves method. Don't want to call this every frame, because it costs a lot of computing time
     move_made = False   #flag variable - used so that we only generate a new set of valid moves by calling get_valid_moves once the game_state has been updated
+    possible_moves = []
 
     
     load_images()   #calls load_images method - we only do it once to conserve computing time
@@ -54,22 +59,45 @@ def main():
                 col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
                 row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
 
+                possible_moves = [] #reset possible moves so the highlighted squares go away
+
+
                #check if square is ALREADY SELECTED
                 if square_selected == (row, col):        #the user clicked the same square twice
                    square_selected = ()        #deselect
                    player_clicks = []  #clear player_clicks
                 else:
-                   square_selected = (row, col) #stores location of click in square_selected variable
-                   player_clicks.append(square_selected) #adds the location of the click to the list 
+                    square_selected = (row, col) #stores location of click in square_selected variable
+                    player_clicks.append(square_selected) #adds the location of the click to the list 
+                    
+                    if len(player_clicks) == 1: #if this is the first click by the player
+                        possible_moves = [] #set possible_moves to an empty array that will hold all the possible moves the player can make
+                        for possible_move in valid_moves:
+                            if possible_move.start_row == row and possible_move.start_col == col: #if a valid move starts at the square the user clicked
+                                possible_moves.append(possible_move) #this list is used to highlight valid moves when a player clicks a square
 
                 #was that the second click?
                 if len(player_clicks) == 2:     #after the second click
                     #now we make our move!
-                    move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
-                    print(move.get_chess_notation())    #prints chess notation for the above move
-                    if move in valid_moves:    #checks whether the move is an element of a valid move. PROBLEM: THIS WILL NOT WORK WITHOUT OVERWRITING THE EQUALS METHOD. OTHERWISE, THE COMPUTER HAS NO WAY OF KNOWING WHETHER THE MOVE MADE BY THE USER'S CLICKS IS EQUAL TO A MOVE IN THE MOVES[] LIST
-                        game_state.make_move(move)  #calls the make move method to actually update the game_state
+
+                    #this just makes the code easier by giving variables to the locations instead of constantly using playerclicks[x][y]
+                    startingRow = player_clicks[0][0]
+                    startingColumn = player_clicks[0][1]
+                    endingRow = player_clicks[1][0]
+                    endingColumn = player_clicks[1][1]
+
+                    if abs(endingColumn - startingColumn) > 1 and (game_state.board[startingRow][startingColumn][1] == "K"): #this monsterous if statment checks to see if the squares the player clicked correspond to a castle move (IE the king was selected and moved more than 1 space left or right)
+                        move1 = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board, is_castle_move= True)
+                    elif endingColumn != startingColumn and (game_state.board[endingRow][endingColumn] == "--" and game_state.board[startingRow][startingColumn][1] == 'P'): #if the move is an enpassant move (if you're moving a pawn diagnally to a blank square)
+                        move1 = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board, is_enpassant_move = True)
+                        print("making enpassant move")
+                    else:
+                        move1 = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)   #creates new move object with start_square as player_clicks[0] (the location of the first click) and end_square as player_clicks[1] (the location of the second click)
+                    print(move1.get_chess_notation())    #prints chess notation for the above move
+                    if move1 in valid_moves:    #checks whether the move is an element of a valid move. PROBLEM: THIS WILL NOT WORK WITHOUT OVERWRITING THE EQUALS METHOD. OTHERWISE, THE COMPUTER HAS NO WAY OF KNOWING WHETHER THE MOVE MADE BY THE USER'S CLICKS IS EQUAL TO A MOVE IN THE MOVES[] LIST
+                        game_state.make_move(move1)  #calls the make move method to actually update the game_state
                         move_made = True    #sets flag variable to true -- indication that a new set of valid_moves needs to be generated
+                        print("a move has been made")
                     square_selected = ()    #reset user clicks
                     player_clicks = []      #resets user clicks
 
@@ -87,7 +115,7 @@ def main():
             move_made = False
 
 
-        draw_game_state(screen, game_state, valid_moves, square_selected) #calls draw_game_state to draw the current state
+        draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves) #calls draw_game_state to draw the current state
 
 
 
@@ -97,11 +125,34 @@ def main():
 
 
 #Method responsible for all the graphics within a current game state
-def draw_game_state(screen, game_state, valid_moves, square_selected):
+def draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves):
     draw_board(screen) #draw squares on the board
-    highlight_squares(screen, game_state, valid_moves, square_selected)
+    highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves)
 
     draw_pieces(screen, game_state.board) #draw pieces on top of squares
+
+    if len(valid_moves) == 0: #this code displays who won after checkmate is reached
+
+                font = p.font.Font('freesansbold.ttf', 80) #creates a font object to generate text
+                white_wins_text = font.render("white wins", True, (0, 0, 0), (255, 0, 255)) #create the white wins text
+                black_wins_text = font.render("black wins", True, (0, 0, 0), (255, 0, 255)) #create the black wins text
+                stalemate_text = font.render("stalemate", True, (0, 0, 0), (255, 0, 255)) #create the stalemate text
+                
+                white_text_rect = white_wins_text.get_rect() #create memory rectangle for white text
+                black_text_rect = black_wins_text.get_rect() #create memory rectangle for black text
+                stalemate_text_rect = stalemate_text.get_rect() #create memory rectangle for stalemate text
+
+                white_text_rect.center = (WIDTH // 2, HEIGHT // 2) #centers memory box for white text
+                black_text_rect.center = (WIDTH // 2, HEIGHT // 2) #centers memory box for black text
+                stalemate_text_rect.center = (WIDTH //2, HEIGHT // 2) #centers memory box for stalemate text
+                
+                if game_state.is_stalemate:
+                    screen.blit(stalemate_text, stalemate_text_rect) #displays the message stalemate
+                elif game_state.is_white_turn:
+                    screen.blit(black_wins_text, black_text_rect) #displays the message white wins
+                else:
+                    print("white wins")
+                    screen.blit(white_wins_text, white_text_rect) #displays the message black wins
 
 #Draw squares on the board. Uses white and grey colors. Call draw board first. Top left square is always white square
 def draw_board(screen):
@@ -112,7 +163,7 @@ def draw_board(screen):
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #draws a colored rectangle beginning at c*SQ_SIZE and r*SQ_SIZE with dimmensions SQ_SIZE * SQ_SIZE
 
 
-def highlight_squares(screen, game_state, valid_moves, square_selected): #Highlights square selected. Highlights valid moves for piece selected
+def highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves): #Highlights square selected. Highlights valid moves for piece selected
     
     #highlight last move
     if(len(game_state.move_log) > 0):
@@ -125,6 +176,12 @@ def highlight_squares(screen, game_state, valid_moves, square_selected): #Highli
             end_square.fill(p.Color("blue"))
             screen.blit(start_square, (last_move.start_col * SQ_SIZE, last_move.start_row * SQ_SIZE))
             screen.blit(end_square, (last_move.end_col * SQ_SIZE, last_move.end_row * SQ_SIZE))
+
+    for possible_move in possible_moves:
+        highlighted_square = p.Surface((SQ_SIZE, SQ_SIZE))
+        highlighted_square.set_alpha(90)
+        highlighted_square.fill(p.Color("green"))
+        screen.blit(highlighted_square, (possible_move.end_col * SQ_SIZE, possible_move.end_row * SQ_SIZE))
 
 
     if square_selected != ():   #if square selected is not an empty tuple
