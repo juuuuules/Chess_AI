@@ -7,7 +7,7 @@ import chess_machine
 import os
 
 p.init()        #initializes pygame
-if not os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
+if os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
     #this works because on Evan's computer the images directory is not in the directory chess_display is running in
     WIDTH = HEIGHT = 700   #sets width and height of display to 700x700 pixels if it's Evan's laptop
 else:
@@ -22,7 +22,7 @@ IMAGES = {} #Creates a global images directory
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
+        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
     #Note: Use  ' IMAGES['wP'] '  to access an image
     
 #Main method - handles user input, updates graphics
