@@ -233,6 +233,7 @@ class Game_State:
                 if(self.board[row - 1][column - 1][0] == 'b'):  #if square diagonally upwards and to the left contains a black piece
                     moves.append(Move((row, column), (row - 1, column - 1), self.board))   #adds a new diagonal capture to the list of moves   
 
+                #from this point forward we look for enpassant moves
                 #------------
                 if(self.board[row - 1][column - 1] == '--' and self.board[row][column - 1] == 'bP'):  #if square diagonally upwards and to the left is empty and the square in front of the pawn is a black pawn
                     if can_enpassant and enpassant_direction == "left":
