@@ -22,7 +22,11 @@ IMAGES = {} #Creates a global images directory
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transoform.scale() method ensures that the piece images are the same size as the square
+        if os.path.isdir("images"):
+            IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transform.scale() method ensures that the piece images are the same size as the square
+        else:
+            IMAGES[piece] = p.transform.scale(p.image.load("CHESS_AI/Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
+
     #Note: Use  ' IMAGES['wP'] '  to access an image
     
 #Main method - handles user input, updates graphics
