@@ -73,10 +73,8 @@ class Game_State:
         if move.is_pawn_promotion:
             self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
 
-        
         #enpassant move
         if move.is_enpassant_move: #if the move is an enpassant move
-            print("enpassant move was just made")
             self.board[move.start_row][move.end_col] = "--" 
 
 
