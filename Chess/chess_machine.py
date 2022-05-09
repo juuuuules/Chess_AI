@@ -84,7 +84,7 @@ class Game_State:
                 self.board[move.start_row][move.end_col] == move.piece_captured
                 print("undoing enpassant move. should have restored pawn to spot " + str(move.start_row) + str(move.end_col))
 
-            self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made
+            self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made (somehow this is breaking)
             self.board[move.end_row][move.end_col] = "--"
 
             if not move.is_enpassant_move: #adds the captured piece back only if the move wasn't enpassant
