@@ -3,7 +3,7 @@
 
 import pygame as p
 from pygame.constants import KEYDOWN, K_z
-import chess_machine
+import chess_machine, chess_evaluator
 import os
 
 p.init()        #initializes pygame
@@ -46,55 +46,60 @@ def main():
     load_images()   #calls load_images method - we only do it once to conserve computing time
     square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
     player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
-    piece_dragging = False
+
+    player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
+    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
     while running:
-        
+
+        is_human_turn = (game_state.is_white_turn and player_one) or (not game_state.is_white_turn and player_two)
+
         for event in p.event.get(): #iterates through all the "events" -- includes clicks, button presses, etc
             if event.type == p.QUIT:    #asks whether user has clicked window close button
                 running = False     #if so, quits game
 
         #mouse handler
             elif event.type == p.MOUSEBUTTONDOWN: #asks whether user clicks somewhere on the screen
-                location = p.mouse.get_pos() #gets the (x, y) location of mouse
-                col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
-                row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
+                if is_human_turn:
+                    location = p.mouse.get_pos() #gets the (x, y) location of mouse
+                    col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
+                    row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
 
-                possible_moves = [] #reset possible moves so the highlighted squares go away
+                    possible_moves = [] #reset possible moves so the highlighted squares go away
 
 
-               #check if square is ALREADY SELECTED
-                if square_selected == (row, col):        #the user clicked the same square twice
-                   square_selected = ()        #deselect
-                   player_clicks = []  #clear player_clicks
-                else:
-                    square_selected = (row, col) #stores location of click in square_selected variable
-                    player_clicks.append(square_selected) #adds the location of the click to the list 
-                    
-                    if len(player_clicks) == 1: #if this is the first click by the player
-                        possible_moves = [] #set possible_moves to an empty array that will hold all the possible moves the player can make
-                        for possible_move in valid_moves:
-                            if possible_move.start_row == row and possible_move.start_col == col: #if a valid move starts at the square the user clicked
-                                possible_moves.append(possible_move) #this list is used to highlight valid moves when a player clicks a square
+                    #check if square is ALREADY SELECTED
+                    if square_selected == (row, col):        #the user clicked the same square twice
+                        square_selected = ()        #deselect
+                        player_clicks = []  #clear player_clicks
+                    else:
+                        square_selected = (row, col) #stores location of click in square_selected variable
+                        player_clicks.append(square_selected) #adds the location of the click to the list 
+                        
+                        if len(player_clicks) == 1: #if this is the first click by the player
+                            possible_moves = [] #set possible_moves to an empty array that will hold all the possible moves the player can make
+                            for possible_move in valid_moves:
+                                if possible_move.start_row == row and possible_move.start_col == col: #if a valid move starts at the square the user clicked
+                                    possible_moves.append(possible_move) #this list is used to highlight valid moves when a player clicks a square
 
-                #was that the second click?
-                if len(player_clicks) == 2:     #after the second click
-                    #now we make our move!
+                    #was that the second click?
+                    if len(player_clicks) == 2:     #after the second click
+                        #now we make our move!
 
-                    move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)
+                        move = chess_machine.Move(player_clicks[0], player_clicks[1], game_state.board)
 
-                    for i in range(len(valid_moves)):
-                        if move == valid_moves[i]:
-                            game_state.make_move(valid_moves[i])        #move generated by the engine, not the move generated by the player
-                            move_made = True
-                            animate = True
-                            print(move.get_chess_notation())
-                            square_selected = ()    #reset user clicks
-                            player_clicks = []      #resets user clicks
-                    if not move_made:
-                        player_clicks = [square_selected]
+                        for i in range(len(valid_moves)):
+                            if move == valid_moves[i]:
+                                game_state.make_move(valid_moves[i])        #move generated by the engine, not the move generated by the player
+                                move_made = True
+                                animate = True
+                                print(move.get_chess_notation())
+                                square_selected = ()    #reset user clicks
+                                player_clicks = []      #resets user clicks
+                        if not move_made:
+                            player_clicks = [square_selected]
 
             #key handler
             elif event.type == p.KEYDOWN:
@@ -112,6 +117,9 @@ def main():
                     player_clicks = []
                     move_made = False
                     animate = False
+        
+        #logic for AI move finder
+
 
 
 
