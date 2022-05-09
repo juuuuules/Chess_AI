@@ -63,7 +63,6 @@ class Game_State:
         
         #empassant move
         if move.is_enpassant_move: #if the move is an enpassant move
-            print("enpassant move was just made")
             self.board[move.start_row][move.end_col] = "--" 
 
         self.update_castle_rights(move) #updates the castling rights for each move
@@ -81,14 +80,12 @@ class Game_State:
 
             #undo enpassant move
             if move.is_enpassant_move:
-                self.board[move.start_row][move.end_col] == move.piece_captured
-                print("undoing enpassant move. should have restored pawn to spot " + str(move.start_row) + str(move.end_col))
+                self.board[move.start_row][move.end_col] = move.piece_captured
 
             self.board[move.start_row][move.start_col] = move.piece_moved   #sets the start row and column of the move back to what it was before the move was made (somehow this is breaking)
             self.board[move.end_row][move.end_col] = "--"
 
             if not move.is_enpassant_move: #adds the captured piece back only if the move wasn't enpassant
-                print("the move is not an enpassant move")
                 self.board[move.end_row][move.end_col] = move.piece_captured    #sets the end row and column of the move back to what it was before the move was made
             self.is_white_turn = not self.is_white_turn #changes turn
        
@@ -108,7 +105,6 @@ class Game_State:
         #undo castle move
         if (move.is_castle_move):
             if move.end_col - move.start_col == 2: #kingside castle
-                print("undoing kingside castle move")
                 self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 1]     #sets the rook back to be one square right of the king instead of one square left of the king
                 self.board[move.end_row][move.end_col - 1] = "--"    #sets the square left of the final king destination to be empty
             else:   #queenside castle
@@ -124,18 +120,14 @@ class Game_State:
         self.is_white_turn = not self.is_white_turn #switches back perspective
         for move in opponent_moves:
             if (move.end_row == row and move.end_col == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
-                print(str(move.end_row) + str(move.end_col) + " is under attack")
-                print("FFFFFFFF")
                 return True
         return False
 
     #checks to see whether king is in check
     def in_check(self):
         if self.is_white_turn:  #if it's white to move
-            #print("white king in check boolean = " + str(self.square_under_attack(self.white_king_location[0], self.white_king_location[1])))
             return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
         else:   #if black to move
-            #print("black king in check boolean = " + str(self.square_under_attack(self.black_king_location[0], self.black_king_location[1])))
             return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])   #checks whether the black king's location is being attacked
 
     #of the possible moves that can occur, filters out the ones that would result in a check
@@ -393,9 +385,6 @@ class Game_State:
 
     #generate all valid castle moves for the king at (row, column) and add them to the list of moves
     def get_castle_moves(self, row, column, moves, ally_color):
-        #print("running get_castle_moves method")
-        #print("the computer thinks that white's ability to castle is " + str(self.current_castle_rights.white_kingside_castle))
-        #print("the computer thinks that black's ability to castle is " + str(self.current_castle_rights.black_kingside_castle))
         if(self.in_check()):
             print("king in check")
             return #can't castle if in check
@@ -408,10 +397,8 @@ class Game_State:
     #generates kingside castle moves
     def get_kingside_castle_moves(self, row, column, moves):
         if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
-            print("space between king and rook is empty")
             if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
                 moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
-                print("the move just added to the valid moves list was a castle move")
     #generates queenside castle moves
     def get_queenside_castle_moves(self, row, column, moves):
         if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
