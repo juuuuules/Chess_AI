@@ -61,21 +61,17 @@ class Game_State:
                 self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 2] #moves the rook - always begins two squares to the left of the king's final position, and ends one square to the right of the king's final position
                 self.board[move.end_row][move.end_col - 2] = "--"   #erases old rook
         
-<<<<<<< HEAD
-     
-=======
         #empassant move
         if move.is_enpassant_move: #if the move is an enpassant move
             self.board[move.start_row][move.end_col] = "--" 
 
->>>>>>> d4484f4359cce095b3cec778c40d7832fe303fa1
         self.update_castle_rights(move) #updates the castling rights for each move
         self.castle_rights_log.append(Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
         
         #promotion
         if move.is_pawn_promotion:
-            self.board[move.end_row][move.end_col] = move.pieced_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
+            self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
 
         
         #enpassant move
