@@ -61,15 +61,20 @@ class Game_State:
                 self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 2] #moves the rook - always begins two squares to the left of the king's final position, and ends one square to the right of the king's final position
                 self.board[move.end_row][move.end_col - 2] = "--"   #erases old rook
         
-        #empassant move
-        if move.is_enpassant_move: #if the move is an enpassant move
-            print("enpassant move was just made")
-            self.board[move.start_row][move.end_col] = "--" 
-
+     
         self.update_castle_rights(move) #updates the castling rights for each move
         self.castle_rights_log.append(Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
+        
+        #promotion
+        if move.is_pawn_promotion:
+            self.board[move.end_row][move.end_col] = move.pieced_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
 
+        
+        #enpassant move
+        if move.is_enpassant_move: #if the move is an enpassant move
+            print("enpassant move was just made")
+            self.board[move.start_row][move.end_col] = "--" 
 
 
     def undo_move(self):    #function that undoes last move
@@ -455,7 +460,16 @@ class Move():
         self.start_col = start_square[1]    #creates a variable for starting column (getting the column coordinate of the tuple)
         self.end_row = end_square[0]        #same thing, but for end_row
         self.end_col = end_square[1]        #same thing, but for end_col
+        self.piece_moved = board[self.start_row][self.start_col]
+        self.piece_captured = board[self.end_row][self.end_col]
+        #promotion
+        self.is_pawn_promotion = False      #pawn promotion presumed false
+        if (self.piece_moved == 'wP' and self.end_row == 0) or (self.piece_moved == 'bP' and self.end_row == 7):
+            self.is_pawn_promotion = True        #make it true if end square of move is on the last row
+
+        #en passant
         self.is_enpassant_move = is_enpassant_move
+
 #--------------------------------------------
         self.piece_moved = board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
         if not self.is_enpassant_move: #checks if the move is enpassant
