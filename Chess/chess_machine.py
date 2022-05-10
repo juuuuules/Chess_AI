@@ -78,8 +78,12 @@ class Game_State:
             self.board[move.start_row][move.end_col] = "--" 
 
 
-    def undo_move(self):    #function that undoes last move
+    def undo_move(self, caused_by_undo = False):    #function that undoes last move
         if len(self.move_log) != 0: #checks to see whether there is a move to undo
+
+            if caused_by_undo:
+                print("you just undid a move")
+                print("white kingside castle right is " + str(self.castle_rights_log[-1].white_kingside_castle))
 
             move = self.move_log[-1]  #gets the last element in the move_log list
             self.move_log = self.move_log[:-1]  #removes the last element in the move_log list
@@ -114,9 +118,20 @@ class Game_State:
             if move.end_col - move.start_col == 2: #kingside castle
                 self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 1]     #sets the rook back to be one square right of the king instead of one square left of the king
                 self.board[move.end_row][move.end_col - 1] = "--"    #sets the square left of the final king destination to be empty
+            
+                if self.is_white_turn:
+                    self.current_castle_rights.white_kingside_castle = True
+                else:
+                    self.current_castle_rights.black_kingside_castle = True
+            
             else:   #queenside castle
                 self.board[move.end_row][move.end_col - 2] = self.board[move.end_row][move.end_col + 1] #moves back the rook to the square two to the left of the final king destination
                 self.board[move.end_row][move.end_col + 1] = "--" #sets the square one right of the final king destination to be empty
+                
+                if self.is_white_turn:
+                    self.current_castle_rights.white_queenside_castle = True
+                else:
+                    self.current_castle_rights.black_queenside_castle = True
 
                 
 
@@ -424,6 +439,11 @@ class Castle_Rights():
         self.white_queenside_castle = white_queenside_castle
         self.black_kingside_castle = black_kingside_castle
         self.black_queenside_castle = black_queenside_castle
+    def set_castle_rights(self, wkc, wqc, bkc, bqc):
+        self.white_kingside_castle = wkc
+        self.white_queenside_castle = wqc
+        self.black_kingside_castle = bkc
+        self.black_queenside_castle = bqc
 
 
 
