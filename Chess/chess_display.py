@@ -18,6 +18,28 @@ SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 #Do we need MAX_FPS variable?????
 IMAGES = {} #Creates a global images directory
 
+def reset_castle_rights(game_state):
+    game_state.current_castle_rights.set_castle_rights(True, True, True, True)
+    game_state.castle_rights_log.append([game_state.current_castle_rights])
+
+    for move in game_state.move_log:
+        if move.piece_moved == 'wR' and move.start_col == 7: #if the right white rook was moved:
+            game_state.current_castle_rights.white_kingside_castle = False
+        if move.piece_moved == 'wR' and move.start_col == 0: #if the left white rook was moved:
+            game_state.current_castle_rights.white_queenside_castle = False
+        if move.piece_moved == 'bR' and move.start_col == 7: #if the right black rook was moved:
+            game_state.current_castle_rights.black_kingside_castle = False
+        if move.piece_moved == 'bR' and move.start_col == 0: #if the left black rook was moved:
+            game_state.current_castle_rights.black_queenside_castle = False
+        if move.piece_moved == 'wK': #if the white king was moved:
+            game_state.current_castle_rights.white_kingside_castle = False
+            game_state.current_castle_rights.white_kingside_castle = False
+        if move.piece_moved == 'bK': #if the black king was moved:
+            game_state.current_castle_rights.black_kingside_castle = False
+            game_state.current_castle_rights.black_kingside_castle = False
+    
+    game_state.castle_rights_log.append(game_state.current_castle_rights)
+
 
 #Method that initializes a global directory of images. Minimize calling this method bc it takes a lot of computing time lol
 def load_images(): 
@@ -127,13 +149,13 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
-            time.sleep(0.3)
             ai_move = chess_evaluator.minimax(game_state, valid_moves)
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
             move_made = True
             animate = True
+            reset_castle_rights(game_state)
 
 
 
