@@ -3,4 +3,4 @@ import os
 
 print(os.path.isfile("chess_machine.py"))
 
-print("FFFXTX")
+print("FFF")
