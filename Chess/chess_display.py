@@ -108,11 +108,12 @@ def main():
             elif event.type == p.KEYDOWN:
                 #UNDO MOVE
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
-                    game_state.undo_move()  #calls undo move
-                    move_made = True    #sets flag variable to true in order to generate a new set of valid moves
-                    animate = False
-                    square_selected = ()    #reset user clicks
-                    player_clicks = []      #resets user clicks
+                    for i in range(2):
+                        game_state.undo_move()  #calls undo move
+                        move_made = True    #sets flag variable to true in order to generate a new set of valid moves
+                        animate = False
+                        square_selected = ()    #reset user clicks
+                        player_clicks = []      #resets user clicks
                 if event.key == p.K_r and p.key.get_mods() & p.KMOD_CTRL:   #reset board when 'ctrl + z' is pressed
                     game_state = chess_machine.Game_State()
                     valid_moves = game_state.get_valid_moves()
