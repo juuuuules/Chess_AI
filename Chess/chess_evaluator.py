@@ -101,9 +101,15 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
     else:
         min_score = CHECKMATE
 
+<<<<<<< HEAD
         for move in valid_moves:
             game_state.make_move(move)
             next_moves = game_state.get_valid_moves()
+=======
+            for move in game_state.valid_moves:
+                new_game_state = game_state.make_move(move)
+                score, move = minimax(new_game_state, depth - 1)
+>>>>>>> 98384e1feab4c9c0a6c18e250c02be42cecbd8cb
 
             score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)
 

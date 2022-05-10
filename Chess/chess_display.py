@@ -5,6 +5,7 @@ import pygame as p
 from pygame.constants import KEYDOWN, K_z
 import chess_machine, chess_evaluator
 import os
+import time
 
 p.init()        #initializes pygame
 if os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
@@ -47,8 +48,8 @@ def main():
     square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
     player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
 
-    player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_one = False   #if a human is playing white than this is true. If an AI is playing white, this is false
+    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
@@ -105,11 +106,17 @@ def main():
             elif event.type == p.KEYDOWN:
                 #UNDO MOVE
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
-                    game_state.undo_move()  #calls undo move
-                    move_made = True    #sets flag variable to true in order to generate a new set of valid moves
-                    animate = False
-                    square_selected = ()    #reset user clicks
-                    player_clicks = []      #resets user clicks
+                    for i in range(2):
+                        game_state.undo_move(caused_by_undo = True)  #calls undo move
+                        move_made = True    #sets flag variable to true in order to generate a new set of valid moves
+                        animate = False
+                        square_selected = ()    #reset user clicks
+                        player_clicks = []      #resets user clicks
+
+                if event.key == p.K_f:
+                    print(game_state.current_castle_rights.white_kingside_castle)
+
+
                 if event.key == p.K_r and p.key.get_mods() & p.KMOD_CTRL:   #reset board when 'ctrl + z' is pressed
                     game_state = chess_machine.Game_State()
                     valid_moves = game_state.get_valid_moves()
@@ -120,7 +127,12 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
+<<<<<<< HEAD
             ai_move = chess_evaluator.minimax(game_state, valid_moves)
+=======
+            time.sleep(.3)
+            ai_move = chess_evaluator.minimax(game_state, computer_depth)[1]
+>>>>>>> 98384e1feab4c9c0a6c18e250c02be42cecbd8cb
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
