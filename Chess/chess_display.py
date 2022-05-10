@@ -36,6 +36,8 @@ def main():
     screen.fill((255, 255, 255))    #sets the screen to be white lol
     
     animate = False #flag variable for when we want to animate a move
+    computer_depth = 10 #sets computer to look 10 moves ahead
+
 
     game_state = chess_machine.Game_State() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
     valid_moves = game_state.get_valid_moves()  #greates a list of valid moves by calling the get_valid_moves method. Don't want to call this every frame, because it costs a lot of computing time
@@ -120,7 +122,7 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
-            ai_move = chess_evaluator.minimax(game_state, valid_moves)
+            ai_move = chess_evaluator.minimax(game_state, computer_depth)[1]
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
