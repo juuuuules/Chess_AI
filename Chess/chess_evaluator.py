@@ -29,7 +29,7 @@ def minimax(game_state, valid_moves):
             score = turn_multiplier * evaluate(game_state.board)
 
         if score > min_score:           #if the score is better than the min, then make THAT equal to the min. For both colors, the goal is to get the max score.
-            score = min_score
+            min_score = score
             best_move = player_move
         
         game_state.undo_move()
