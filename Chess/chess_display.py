@@ -127,12 +127,8 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
-<<<<<<< HEAD
+            time.sleep(0.3)
             ai_move = chess_evaluator.minimax(game_state, valid_moves)
-=======
-            time.sleep(.3)
-            ai_move = chess_evaluator.minimax(game_state, computer_depth)[1]
->>>>>>> 98384e1feab4c9c0a6c18e250c02be42cecbd8cb
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
