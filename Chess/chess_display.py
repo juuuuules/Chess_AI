@@ -37,7 +37,13 @@ def reset_castle_rights(game_state):
         if move.piece_moved == 'bK': #if the black king was moved:
             game_state.current_castle_rights.black_kingside_castle = False
             game_state.current_castle_rights.black_kingside_castle = False
-    
+        #-----------------------
+        row = game_state.white_king_location[0]
+        column = game_state.white_king_location[1]
+        if game_state.board[row][column+1] == '--' and game_state.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
+            if (not game_state.square_under_attack(row, column+1) and not game_state.square_under_attack(row, column + 2)):
+                game_state.current_castle_rights #------------------- move this up and add for other 4 cases
+
     game_state.castle_rights_log.append(game_state.current_castle_rights)
 
 
