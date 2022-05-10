@@ -61,7 +61,7 @@ def minimax(game_state, depth):
             best_score = -CHECKMATE
             best_move = None
 
-            for move in game_state.valid_moves():
+            for move in game_state.valid_moves:
                 new_game_state = game_state.make_move(move)
                 score, move = minimax(new_game_state, depth - 1)
 

@@ -50,8 +50,8 @@ def main():
     square_selected = ()    #creates a tuple (for rows and columns) to store the coordinates of a selected square. No square is selected initially. Keeps track of the most recent click of the user.
     player_clicks = []      #keeps track of player clicks. Two tuples: [(starting x, starting y) and (ending x, ending y)]. Empty to start.
 
-    player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_one = False   #if a human is playing white than this is true. If an AI is playing white, this is false
+    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
