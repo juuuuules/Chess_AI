@@ -3,4 +3,5 @@ import os
 
 print(os.path.isfile("chess_machine.py"))
 
-print("FFF")
+for i in range(50):
+    print(i)
