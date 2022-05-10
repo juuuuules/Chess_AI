@@ -5,6 +5,7 @@ import pygame as p
 from pygame.constants import KEYDOWN, K_z
 import chess_machine, chess_evaluator
 import os
+import time
 
 p.init()        #initializes pygame
 if os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
@@ -122,6 +123,7 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
+            time.sleep(.3)
             ai_move = chess_evaluator.minimax(game_state, computer_depth)[1]
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
