@@ -37,6 +37,13 @@ class Game_State:
         self.white_in_check = False
         self.black_in_check = False
 
+        #yeah sorry this is very inefficient and makes some lines of code pointless
+        #but it also prevents the issue of enabling castling at bad times so imma use it for now
+        self.cant_white_kingside = False
+        self.cant_white_queenside = False
+        self.cant_black_kingside = False
+        self.cant_black_queenside = False
+
         #castling global variables. For more information see the heading above the Castle_Rights class
         self.current_castle_rights = Castle_Rights(True, True, True, True)  #wks, wqs, bks, bqs all true at start of game
         self.castle_rights_log = [Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
@@ -421,14 +428,16 @@ class Game_State:
     
     #generates kingside castle moves
     def get_kingside_castle_moves(self, row, column, moves):
-        if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
-            if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
-                moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
+        if column + 2 < 8:
+            if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
+                if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
+                    moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
     #generates queenside castle moves
     def get_queenside_castle_moves(self, row, column, moves):
-        if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
-             if (not self.square_under_attack(row, column-1) and not self.square_under_attack(row, column - 2)):   #if squares one and two columns over from the king are not being attacked. DOn't have to check square three over, because the king does not pass thru that square
-                moves.append(Move((row, column), (row, column - 2), self.board, is_castle_move = True))
+        if column - 2 > 0:
+            if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
+                if (not self.square_under_attack(row, column-1) and not self.square_under_attack(row, column - 2)):   #if squares one and two columns over from the king are not being attacked. DOn't have to check square three over, because the king does not pass thru that square
+                    moves.append(Move((row, column), (row, column - 2), self.board, is_castle_move = True))
 
 
 #Castling Rights class. Creates objects with 4 boolean parameters indicating whether/how white and black can castle.

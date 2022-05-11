@@ -24,21 +24,48 @@ def reset_castle_rights(game_state):
     game_state.current_castle_rights.set_castle_rights(True, True, True, True)
     game_state.castle_rights_log.append([game_state.current_castle_rights])
 
-    for move in game_state.move_log:
-        if move.piece_moved == 'wR' and move.start_col == 7: #if the right white rook was moved:
-            game_state.current_castle_rights.white_kingside_castle = False
-        if move.piece_moved == 'wR' and move.start_col == 0: #if the left white rook was moved:
-            game_state.current_castle_rights.white_queenside_castle = False
-        if move.piece_moved == 'bR' and move.start_col == 7: #if the right black rook was moved:
-            game_state.current_castle_rights.black_kingside_castle = False
-        if move.piece_moved == 'bR' and move.start_col == 0: #if the left black rook was moved:
-            game_state.current_castle_rights.black_queenside_castle = False
-        if move.piece_moved == 'wK': #if the white king was moved:
-            game_state.current_castle_rights.white_kingside_castle = False
-            game_state.current_castle_rights.white_kingside_castle = False
-        if move.piece_moved == 'bK': #if the black king was moved:
-            game_state.current_castle_rights.black_kingside_castle = False
-            game_state.current_castle_rights.black_kingside_castle = False
+    if not game_state.cant_white_kingside:
+        for move in game_state.move_log:
+            if move.piece_moved == 'wR' and move.start_col == 7: #if the right white rook was moved:
+                game_state.current_castle_rights.white_kingside_castle = False
+                game_state.cant_white_kingside = True
+
+    if not game_state.cant_white_queenside:
+        for move in game_state.move_log:
+            if move.piece_moved == 'wR' and move.start_col == 0: #if the left white rook was moved:
+                game_state.current_castle_rights.white_queenside_castle = False
+                game_state.cant_white_queenside = True
+
+    if not game_state.cant_black_kingside:
+        for move in game_state.move_log:
+            if move.piece_moved == 'bR' and move.start_col == 7: #if the right black rook was moved:
+                game_state.current_castle_rights.black_kingside_castle = False
+                game_state.cant_black_kingside = True
+
+    if not game_state.cant_black_queenside:
+        for move in game_state.move_log:
+            if move.piece_moved == 'bR' and move.start_col == 0: #if the left black rook was moved:
+                game_state.current_castle_rights.black_queenside_castle = False
+                game_state.cant_black_queenside = True
+
+    if not (game_state.cant_white_kingside or game_state.cant_white_queenside):
+        for move in game_state.move_log:
+            if move.piece_moved == 'wK': #if the white king was moved:
+                game_state.current_castle_rights.white_kingside_castle = False
+                game_state.current_castle_rights.white_queenside_castle = False
+
+                game_state.cant_white_kingside = True
+                game_state.cant_white_queenside = True
+
+    if not (game_state.cant_black_kingside or game_state.cant_black_queenside):
+        for move in game_state.move_log:
+            if move.piece_moved == 'bK': #if the black king was moved:
+                game_state.current_castle_rights.black_kingside_castle = False
+                game_state.current_castle_rights.black_queenside_castle = False
+
+                game_state.cant_black_kingside = True
+                game_state.cant_black_queenside = True
+
         
         # row = game_state.white_king_location[0]
         # column = game_state.white_king_location[1]
