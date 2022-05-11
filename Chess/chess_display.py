@@ -81,7 +81,7 @@ def main():
     game_over = False
 
     player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
@@ -179,6 +179,18 @@ def main():
 
         draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves) #calls draw_game_state to draw the current state
 
+        #End game handlers
+        #Checkmate:
+        if game_state.is_checkmate:
+            game_over = True
+            if game_state.is_white_turn:
+                draw_text(screen, 'White wins by checkmate')
+            else:
+                draw_text(screen, 'Black wins by checkmate')
+        elif game_state.is_stalemate:
+            game_over = True
+            draw_text(screen, 'The game ends in a draw')
+
 
 
         clock.tick()    #updates the clock -- called once per frame; computes how many milliseconds have passed since previous call
@@ -190,32 +202,9 @@ def main():
 def draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves):
     draw_board(screen) #draw squares on the board
     highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves)
-
     draw_pieces(screen, game_state.board) #draw pieces on top of squares
 
-    if len(valid_moves) == 0: #this code displays who won after checkmate is reached
-
-                font = p.font.Font('freesansbold.ttf', 80) #creates a font object to generate text
-                white_wins_text = font.render("white wins", True, (0, 0, 0), (255, 0, 255)) #create the white wins text
-                black_wins_text = font.render("black wins", True, (0, 0, 0), (255, 0, 255)) #create the black wins text
-                stalemate_text = font.render("stalemate", True, (0, 0, 0), (255, 0, 255)) #create the stalemate text
-                
-                white_text_rect = white_wins_text.get_rect() #create memory rectangle for white text
-                black_text_rect = black_wins_text.get_rect() #create memory rectangle for black text
-                stalemate_text_rect = stalemate_text.get_rect() #create memory rectangle for stalemate text
-
-                white_text_rect.center = (WIDTH // 2, HEIGHT // 2) #centers memory box for white text
-                black_text_rect.center = (WIDTH // 2, HEIGHT // 2) #centers memory box for black text
-                stalemate_text_rect.center = (WIDTH //2, HEIGHT // 2) #centers memory box for stalemate text
-                
-                if game_state.is_stalemate:
-                    screen.blit(stalemate_text, stalemate_text_rect) #displays the message stalemate
-                elif game_state.is_white_turn:
-                    screen.blit(black_wins_text, black_text_rect) #displays the message white wins
-                else:
-                    print("white wins")
-                    screen.blit(white_wins_text, white_text_rect) #displays the message black wins
-
+  
 #Draw squares on the board. Uses white and grey colors. Call draw board first. Top left square is always white square
 def draw_board(screen):
     global colors
@@ -226,6 +215,7 @@ def draw_board(screen):
             p.draw.rect(screen, color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #draws a colored rectangle beginning at c*SQ_SIZE and r*SQ_SIZE with dimmensions SQ_SIZE * SQ_SIZE
 
 
+#Function that highlights the squares
 def highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves): #Highlights square selected. Highlights valid moves for piece selected
     
     #highlight last move
@@ -240,6 +230,7 @@ def highlight_squares(screen, game_state, valid_moves, square_selected, possible
             screen.blit(start_square, (last_move.start_col * SQ_SIZE, last_move.start_row * SQ_SIZE))
             screen.blit(end_square, (last_move.end_col * SQ_SIZE, last_move.end_row * SQ_SIZE))
 
+    #highlights the legal moves a selected piece can make
     for possible_move in possible_moves:
         highlighted_square = p.Surface((SQ_SIZE, SQ_SIZE))
         highlighted_square.set_alpha(90)
@@ -260,7 +251,7 @@ def highlight_squares(screen, game_state, valid_moves, square_selected, possible
             #highlight valid moves from that square
             
 
-#Draw pieces on the board using current game_state.board
+#Function that draws the pieces onto the board using current game_state.board
 def draw_pieces(screen, board):
     for r in range(DIMENSION):      #double for loop to iterate over the board and go square by square
         for c in range(DIMENSION):
@@ -268,9 +259,7 @@ def draw_pieces(screen, board):
             if piece != "--": #if not an empty square
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #outputs the image of the identified piece at location c*SQ_SIZE r*SQ_SIZE with dimensions SQ_SIZE * SQ_SIZE
 
-
-#def draw_move_log(screen, game_state): #FOR LATER
-
+#Function that animates the moves
 def animate_move(move, screen, board, clock):
     global colors
     coordinates = []    #list of row/column coordinates the animation will move through
@@ -298,6 +287,11 @@ def animate_move(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)  #framerate
 
+def draw_text(screen, text):
+    font = p.font.SysFont("Helvetica", 80, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+    text_object = font.render(text, True, 0, (255, 0, 255))
+    text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
+    screen.blit(text_object, text_location) #blits the text_object at the proper location.
 
 main() #calls the main method
 
