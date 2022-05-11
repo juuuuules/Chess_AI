@@ -34,6 +34,9 @@ class Game_State:
         self.is_checkmate = False
         self.is_stalemate = False
 
+        self.white_in_check = False
+        self.black_in_check = False
+
         #castling global variables. For more information see the heading above the Castle_Rights class
         self.current_castle_rights = Castle_Rights(True, True, True, True)  #wks, wqs, bks, bqs all true at start of game
         self.castle_rights_log = [Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
@@ -83,7 +86,6 @@ class Game_State:
 
             if caused_by_undo:
                 print("you just undid a move")
-                print("white kingside castle right is " + str(self.castle_rights_log[-1].white_kingside_castle))
 
             move = self.move_log[-1]  #gets the last element in the move_log list
             self.move_log = self.move_log[:-1]  #removes the last element in the move_log list
@@ -407,7 +409,8 @@ class Game_State:
 
     #generate all valid castle moves for the king at (row, column) and add them to the list of moves
     def get_castle_moves(self, row, column, moves, ally_color):
-        if(self.in_check()):
+        updated_check_status = (self.white_in_check and self.is_white_turn) or (self.black_in_check and not self.is_white_turn)
+        if(self.in_check() and updated_check_status):
             print("king in check")
             return #can't castle if in check
         if((self.is_white_turn and self.current_castle_rights.white_kingside_castle) or (not self.is_white_turn and self.current_castle_rights.black_kingside_castle)): #if it's white turn and white has kingside castle rights OR it's black's turn and black has kingside castle rights

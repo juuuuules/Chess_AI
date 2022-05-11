@@ -7,8 +7,10 @@ import chess_machine, chess_evaluator
 import os
 import time
 
+print(os.path.isdir("images"))
+
 p.init()        #initializes pygame
-if os.path.isdir("images"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
+if os.path.isdir("Chess"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
     #this works because on Evan's computer the images directory is not in the directory chess_display is running in
     WIDTH = HEIGHT = 700   #sets width and height of display to 700x700 pixels if it's Evan's laptop
 else:
@@ -18,13 +20,41 @@ SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 #Do we need MAX_FPS variable?????
 IMAGES = {} #Creates a global images directory
 
+def reset_castle_rights(game_state):
+    game_state.current_castle_rights.set_castle_rights(True, True, True, True)
+    game_state.castle_rights_log.append([game_state.current_castle_rights])
+
+    for move in game_state.move_log:
+        if move.piece_moved == 'wR' and move.start_col == 7: #if the right white rook was moved:
+            game_state.current_castle_rights.white_kingside_castle = False
+        if move.piece_moved == 'wR' and move.start_col == 0: #if the left white rook was moved:
+            game_state.current_castle_rights.white_queenside_castle = False
+        if move.piece_moved == 'bR' and move.start_col == 7: #if the right black rook was moved:
+            game_state.current_castle_rights.black_kingside_castle = False
+        if move.piece_moved == 'bR' and move.start_col == 0: #if the left black rook was moved:
+            game_state.current_castle_rights.black_queenside_castle = False
+        if move.piece_moved == 'wK': #if the white king was moved:
+            game_state.current_castle_rights.white_kingside_castle = False
+            game_state.current_castle_rights.white_kingside_castle = False
+        if move.piece_moved == 'bK': #if the black king was moved:
+            game_state.current_castle_rights.black_kingside_castle = False
+            game_state.current_castle_rights.black_kingside_castle = False
+        
+        # row = game_state.white_king_location[0]
+        # column = game_state.white_king_location[1]
+        # if game_state.board[row][column+1] == '--' and game_state.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
+        #     if (not game_state.square_under_attack(row, column+1) and not game_state.square_under_attack(row, column + 2)):
+        #         game_state.current_castle_rights.white_kingside_castle = True
+
+    game_state.castle_rights_log.append(game_state.current_castle_rights)
+
 
 #Method that initializes a global directory of images. Minimize calling this method bc it takes a lot of computing time lol
 def load_images(): 
     pieces = ['wP', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bP', 'bR', 'bN', 'bB', 'bK', 'bQ']   #array of all the pieces
     for piece in pieces:
-        if os.path.isdir("images"):
-            IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transform.scale() method ensures that the piece images are the same size as the square
+        if os.path.isdir("Chess"):
+            IMAGES[piece] = p.transform.scale(p.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) #iterates through the array and loads each image into the global IMAGES directory. transform.scale() method ensures that the piece images are the same size as the square
         else:
             IMAGES[piece] = p.transform.scale(p.image.load("Chess_AI/Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE)) 
 
@@ -130,13 +160,13 @@ def main():
         
         #logic for AI move finder
         if not is_human_turn:
-            time.sleep(0.3)
             ai_move = chess_evaluator.minimax(game_state, valid_moves)
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
             move_made = True
             animate = True
+            reset_castle_rights(game_state)
 
 
 
