@@ -184,9 +184,9 @@ def main():
         if game_state.is_checkmate:
             game_over = True
             if game_state.is_white_turn:
-                draw_text(screen, 'White wins by checkmate')
-            else:
                 draw_text(screen, 'Black wins by checkmate')
+            else:
+                draw_text(screen, 'White wins by checkmate')
         elif game_state.is_stalemate:
             game_over = True
             draw_text(screen, 'The game ends in a draw')
