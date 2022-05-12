@@ -38,7 +38,7 @@ class Game_State:
         self.valid_moves = []
         self.pins = []      #keeps track of all the pins on the board
         self.checks = []       #keeps track of all the checks on the board
-        self.enpassant_possible = ()       #coordinates for the
+        self.enpassant_possible = ()       #coordinates for the square where en passant capture is possible
         self.enpassant_possible_log = [self.enpassant_possible]
 
 
@@ -108,7 +108,7 @@ class Game_State:
 
 
         #update enpassant_possible variable
-        if move.piece_moved[1] == "p" and abs(move.start_row - move.end_row) == 2:  #if move is a 2 square pawn advance
+        if move.piece_moved[1] == "P" and abs(move.start_row - move.end_row) == 2:  #if move is a 2 square pawn advance
             self.enpassant_possible = ((move.start_row + move.end_row) // 2, move.start_col)    #coords of en_passant location
         else:
             self.enpassant_possible = ()
@@ -192,6 +192,12 @@ class Game_State:
        
         moves = []
         self.is_in_check, self.pins, self.checks = self.get_pins_and_checks()  #sets field variables to be the result of the get_pins_and_checks function
+        
+        """
+        PRINT STATEMENT FOR DEBUGGING
+        """
+        print(self.pins)    
+
 
         if self.is_white_turn:
             king_row = self.white_king_location[0]
@@ -414,7 +420,7 @@ class Game_State:
             enemy_color = "b"
             king_row, king_col = self.white_king_location
         else:
-            move_amount = -1
+            move_amount = 1
             start_row = 1
             enemy_color = "w"
             king_row, king_col = self.black_king_location
@@ -573,6 +579,7 @@ class Game_State:
                 pin_direction = (self.pins[i][2], self.pins[i][3])
                 self.pins.remove(self.pins[i])
                 break
+        print(self.pins)
         
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))   #unit vectors for the diagonals: up/left, up/right, down/left, down/right
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
@@ -666,10 +673,6 @@ class Castle_Rights():
 
 
 
-
-
-
-
 class Move():
 
     #conversion strings -- changing the ranks and files found in common chess notation to the rows and columns of our board matrix 
@@ -680,7 +683,9 @@ class Move():
     files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}       #converts each file of squares in standard chess notation to a column in the board matrix.
     cols_to_files = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}       #same thing but vice versa
 
-    #constructor
+    """
+    Constructor.
+    """
     def __init__(self, start_square, end_square, board, is_enpassant_move = False, is_castle_move = False):        #Note: start_square and end_square are tuples. Two optional parameters for whether it's a castle or an en passant
         self.start_row = start_square[0]    #creates a variable for starting row (getting the row coordinate of the tuple)
         self.start_col = start_square[1]    #creates a variable for starting column (getting the column coordinate of the tuple)
@@ -688,40 +693,45 @@ class Move():
         self.end_col = end_square[1]        #same thing, but for end_col
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
-        #promotion
+        
+
+        #promotion move
         self.is_pawn_promotion = False      #pawn promotion presumed false
         if (self.piece_moved == 'wP' and self.end_row == 0) or (self.piece_moved == 'bP' and self.end_row == 7):
             self.is_pawn_promotion = True        #make it true if end square of move is on the last row
 
-        #en passant
+        #en passant move
         self.is_enpassant_move = is_enpassant_move
+        if self.is_enpassant_move:
+            if self.piece_moved == "bP":
+                self.piece_captured = "wP"
+            else:
+                self.piece_captured = "bP"
 
-#--------------------------------------------
-        self.piece_moved = board[self.start_row][self.start_col]    #gets the piece located on the board at the beginning square
-        if not self.is_enpassant_move: #checks if the move is enpassant
-            self.piece_captured = board[self.end_row][self.end_col]     #gets the piece located on the board at the ending square. This is the piece that is captured by any given move. Might end up being "--".
-        else: #if the move is enpassant, update the piece_captured attribute to reflect the pawn that was captured
-            self.piece_captured = board[self.start_row][self.end_col]
-        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col   #gives each move a unique move id between 0 and 7777. Useful when comparing whether two moves are equal.
-#--------------------------------------------
+        #castle move
         self.is_castle_move = is_castle_move
 
-
-    #Overriding the equals method. This means that two moves are considered "equal" if they have the same start row, start col, end row, and end col. That information is nicely tracked in the move ID variable
-    #This is copy-pasted from stack exchange lol
+        #moveID
+        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col   #gives each move a unique move id between 0 and 7777. Useful when comparing whether two moves are equal.
+        
+        
+    """
+    Overriding the Equals method. 
+    Two moves are "equal" if they have the same start_row, start_col, end_row, and end_col.
+    Copy and pasted from stack exchange.
+    """
     def __eq__(self, other):    #comparing the self object to another move object, saved in the parameter other
         if isinstance(other, Move): #if "other" object is an instance of the Move class
              return self.moveID == other.moveID #returns true if two move IDs are the same, and false if they are different.
         return False
 
-    #conversion method from matrix notation to chess notation (e.g. [6, 4] would become ["e", "3"]). I'm lazy. That's why this exists.
+    """
+    Chess Notation methods.
+    """
+    #Function that converts from matrix notation to chess notation (e.g. [6, 4] would become ["e", "3"]).
     def get_chess_notation(self):
         return self.get_rank_file(self.start_row, self.start_col) + self.get_rank_file(self.end_row, self.end_col)  #creates a string that is a concatenation of starting square and ending square in chess notation. E.g. "e4e5"
 
-    #helper method to get rank and file given row and column
+    #Helper function. Gets  rank and file given row and column.
     def get_rank_file(self, row, col):
         return self.cols_to_files[col] + self.rows_to_ranks[row]    #returns the file corresponding to the column "col" + the rank corresponding to the row "row". File then rank, because thats how chess notation works
-
-
-
-print("wrong file bozo")
