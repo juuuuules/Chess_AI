@@ -175,8 +175,8 @@ def main():
             elif event.type == p.KEYDOWN:
                 #UNDO MOVE
                 if event.key == p.K_z and p.key.get_mods() & p.KMOD_CTRL:   #undo when 'ctrl + z' is pressed -- thanks stack exchange!
-                    for i in range(2):
-                        game_state.undo_move(caused_by_undo = True)  #calls undo move
+                    for i in range(2):      #forces u to undo twice
+                        game_state.undo_move()  #calls undo move
                         move_made = True    #sets flag variable to true in order to generate a new set of valid moves
                         animate = False
                         square_selected = ()    #reset user clicks
