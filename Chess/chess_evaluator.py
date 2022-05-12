@@ -68,17 +68,14 @@ def evaluate(game_state):
 
 #HELPER METHOD TO MAKE FIRST RECURSIVE CALL
 def minimax(game_state, valid_moves):
-    global best_move
-    best_move = None
-    minimax_algorithm(game_state, valid_moves, MAX_DEPTH, game_state.is_white_turn)
-    return best_move
+    return minimax_algorithm(game_state, valid_moves, MAX_DEPTH, game_state.is_white_turn)[1]
 
 
 #return a score for the position at a given depth
 def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
-
+    best_move = None
     if depth == 0:
-        return evaluate(game_state)
+        return evaluate(game_state), best_move
     
     if is_white_turn:
         max_score = -CHECKMATE
@@ -87,7 +84,7 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
             game_state.make_move(move)
             next_moves = game_state.get_valid_moves()
 
-            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)
+            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
 
             if score > max_score:
                 max_score = score
@@ -96,7 +93,7 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
 
             game_state.undo_move()
 
-        return max_score
+        return max_score, best_move
 
     else:
         min_score = CHECKMATE
@@ -105,13 +102,13 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
             game_state.make_move(move)
             next_moves = game_state.get_valid_moves()
 
-            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)
+            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
 
             if score < min_score:
                 min_score = score
                 if depth == MAX_DEPTH:
                     best_move = move
             game_state.undo_move()
-        return min_score
+        return min_score, best_move
         
 

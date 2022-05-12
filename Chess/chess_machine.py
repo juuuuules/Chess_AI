@@ -196,7 +196,7 @@ class Game_State:
         """
         PRINT STATEMENT FOR DEBUGGING
         """
-        print(self.pins)    
+        #print(self.pins)    
 
 
         if self.is_white_turn:
@@ -579,7 +579,7 @@ class Game_State:
                 pin_direction = (self.pins[i][2], self.pins[i][3])
                 self.pins.remove(self.pins[i])
                 break
-        print(self.pins)
+       # print(self.pins)
         
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))   #unit vectors for the diagonals: up/left, up/right, down/left, down/right
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
