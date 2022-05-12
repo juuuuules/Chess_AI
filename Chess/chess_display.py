@@ -221,11 +221,14 @@ def main():
             game_over = True
             if game_state.is_white_turn:
                 draw_text(screen, 'Black wins by checkmate')
+                time.sleep(2)
             else:
                 draw_text(screen, 'White wins by checkmate')
+                time.sleep(2)
         elif game_state.is_draw:
             game_over = True
             draw_text(screen, 'The game ends in a draw')
+            time.sleep(2)
 
 
 
