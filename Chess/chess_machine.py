@@ -23,25 +23,42 @@ class Game_State:
         board = [row1, row2, row3, row4, row5, row6, row7, row8]
         self.board = board
 
-        self.is_white_turn = True #pretty self explantory
-        self.move_log = [] #this will contain all previous moves when we finally implement that function
+        #Flag variables
+        self.is_white_turn = True #white to move at the start of the game
+        self.is_checkmate = False   #not checkmate or a draw at the start of the game
+        self.is_draw = False
+        self.is_in_check = False
 
+        #initialize variables
+
+        self.move_functions = {"P": self.get_pawn_moves, "R": self.get_rook_moves, "N": self.get_knight_moves,
+                              "B": self.get_bishop_moves, "Q": self.get_queen_moves, "K": self.get_king_moves}
+
+        self.move_log = []      #creates a list to store all the moves played during the game
         self.valid_moves = []
+        self.pins = []      #keeps track of all the pins on the board
+        self.checks = []       #keeps track of all the checks on the board
+        self.enpassant_possible = ()       #coordinates for the
+        self.enpassant_possible_log = [self.enpassant_possible]
 
-        #i couldn't figure out how to deal with checks, so i decided to just keep track of kings location. Also should help w castling
+
+        #King location variables
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
         self.black_king_location = (0, 4)   #black king starts at row 0 col 4
-        self.is_checkmate = False
-        self.is_stalemate = False
-
-        self.white_in_check = False
-        self.black_in_check = False
-
-        #castling global variables. For more information see the heading above the Castle_Rights class
+        
+        #Castle Rights variables
         self.current_castle_rights = Castle_Rights(True, True, True, True)  #wks, wqs, bks, bqs all true at start of game
         self.castle_rights_log = [Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                                         self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle)]  #creates a list of castling_rights objects, taking a snapshot of the current castling rights state by creating a new Castle_Rights object 
 
+        #REMOVE LATER
+        self.white_in_check = False
+        self.black_in_check = False
+
+
+    """
+    Make move method. Takes a move as a parameter and executes it.
+    """
     def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
 
         self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
@@ -55,6 +72,30 @@ class Game_State:
         elif (move.piece_moved == 'bK'):
             self.black_king_location = (move.end_row, move.end_col) #set black king location to the end square of the king move
 
+        #pawn promotion
+        if move.is_pawn_promotion:
+
+            #Handler to let user choose piece to promote to:
+            # if not is_AI:
+            #     promoted_piece = input("Promote to Q, R, B, N:")    #Take this to UI later
+            #     self.board[move.end_row][move.end_col] = move.piece_moved[0] + promoted_piece  
+            # else:
+
+            self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
+
+        #enpassant move
+        if move.is_enpassant_move:
+            self.board[move.start_row][move.end_col] = "--" #captures the pawn on the square adjacent
+
+
+        #update enpassant_possible variable
+        if move.piece_moved[1] == "p" and abs(move.start_row - move.end_row) == 2:  #if move is a 2 square pawn advance
+            self.enpassant_possible = ((move.start_row + move.end_row) // 2, move.start_col)    #coords of en_passant location
+        else:
+            self.enpassant_possible = ()
+
+        self.enpassant_possible_log.append(self.enpassant_possible) #add enpassant_possible coordinates to the en_passant_possible log
+
         #castle move
         if move.is_castle_move:  #if the move is a castle move
             if move.end_col - move.start_col == 2: #kingside castle move
@@ -64,24 +105,15 @@ class Game_State:
                 self.board[move.end_row][move.end_col + 1] = self.board[move.end_row][move.end_col - 2] #moves the rook - always begins two squares to the left of the king's final position, and ends one square to the right of the king's final position
                 self.board[move.end_row][move.end_col - 2] = "--"   #erases old rook
         
-        #empassant move
-        if move.is_enpassant_move: #if the move is an enpassant move
-            self.board[move.start_row][move.end_col] = "--" 
-
+        #update castling rights - whenever it is a rook or a king move
         self.update_castle_rights(move) #updates the castling rights for each move
         self.castle_rights_log.append(Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
-        
-        #promotion
-        if move.is_pawn_promotion:
-            self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q' #makes the piece moved to a promotion square actually a queen. move.piece_moved[0] grabs the color.
 
-        #enpassant move
-        if move.is_enpassant_move: #if the move is an enpassant move
-            self.board[move.start_row][move.end_col] = "--" 
-
-
-    def undo_move(self, caused_by_undo = False):    #function that undoes last move
+    """
+    Undo function that reverses previous move.
+    """
+    def undo_move(self, caused_by_undo = False):
         if len(self.move_log) != 0: #checks to see whether there is a move to undo
 
             if caused_by_undo:
@@ -135,56 +167,67 @@ class Game_State:
                 else:
                     self.current_castle_rights.black_queenside_castle = True
 
-                
-
-    #determines whether an enemy can attack the square row / col    
-    def square_under_attack(self, row, column):   
-        self.is_white_turn = not self.is_white_turn #looks at opponents moves
-        opponent_moves = self.get_possible_moves_MODIFIED()
-        self.is_white_turn = not self.is_white_turn #switches back perspective
-        for move in opponent_moves:
-            if (move.end_row == row and move.end_col == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
-                return True
-        return False
-
-    #checks to see whether king is in check
-    def in_check(self):
-        if self.is_white_turn:  #if it's white to move
-            return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
-        else:   #if black to move
-            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])   #checks whether the black king's location is being attacked
-
-    #of the possible moves that can occur, filters out the ones that would result in a check
+    """
+    Function that gets a list of all the legal moves in a particular position.
+    """
     def get_valid_moves(self):
+
         #Pseudo code:
-        # 1 - get all possible moves. Calls the get_possible_moves method.
-        # 2 - Make each move. 
-        # 3 - For each move, generates all moves for the OPPOSING player, and sees whether any of them will result in the king being threatened
-        # 4 - sees if any of those moves attacks king
-        # 5 - if it does, remove it from the list.
+        # 1 - determine what pieces are pinned and which enemy pieces are putting the king in check (using the get_pins_and_checks() method)
+        # 2 - Go through a series of conditionals to determine which moves should be axed from the get_all_moves() method
+        #   a - if king in check by 1 piece that is not a knight, then capture, block, or move.
+        #   b - if king in check by 1 piece that is a knight, then capture or move. 
+        #   c - if king in check by 2 pieces, then move. 
+        # 3 - if there are no moves, then either checkmate or stalemate has occured. End the game. 
+
         temp_castle_rights = Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle)    #copy the current castling rights and saves it in a temp variable so that generating the possible moves won't mess with the castle rights.
        
-        moves = self.get_possible_moves_MODIFIED()
-        
-        #now generate the castle moves
-        if (self.is_white_turn):
-            ally_color = 'w'
-            self.get_castle_moves(self.white_king_location[0], self.white_king_location[1], moves, ally_color)
+        moves = []
+        self.is_in_check, self.pins, self.checks = self.get_pins_and_checks()  #sets field variables to be the result of the get_pins_and_checks function
+
+        if self.is_white_turn:
+            king_row = self.white_king_location[0]
+            king_col = self.white_king_location[1]
         else:
-            ally_color = 'b'
-            self.get_castle_moves(self.black_king_location[0], self.black_king_location[1], moves, ally_color)
+            king_row = self.black_king_location[0]
+            king_col = self.black_king_location[1]
 
-        for i in range(len(moves)-1, -1, -1): #iterates through the moves list backwards. Starts at last index, goes until just before -1 index, over increments of -1. We go backwards to avoid list reindexing when removing things
-            self.make_move(moves[i])    #makes each move.
-            self.is_white_turn = not self.is_white_turn #IMPORTANT: the make_move function switches turns automatcically. If this line didn't exist, we'd be looking at the wrong player's king
-            if self.in_check(): #if move puts king in check, then it's not a valid move
-                moves.remove(moves[i])  #remove the move at index i
+        if self.is_in_check:
+            if len(self.checks) == 1:  # only 1 check, block the check or move the king
+                moves = self.get_all_moves()
+                # to block the check you must put a piece into one of the squares between the enemy piece and your king
+                check = self.checks[0]  # check information
+                check_row = check[0]
+                check_col = check[1]
+                piece_checking = self.board[check_row][check_col]
+                valid_squares = []  # squares that pieces can move to
+                # if knight, must capture the knight or move your king, other pieces can be blocked
+                if piece_checking[1] == "N":
+                    valid_squares = [(check_row, check_col)]
+                else:
+                    for i in range(1, 8):
+                        valid_square = (king_row + check[2] * i,
+                                        king_col + check[3] * i)  # check[2] and check[3] are the check directions
+                        valid_squares.append(valid_square)
+                        if valid_square[0] == check_row and valid_square[1] == check_col:  # once you get to piece and check
+                            break
+                # get rid of any moves that don't block check or move king
+                for i in range(len(moves) - 1, -1, -1):  # iterate through the list backwards when removing elements
+                    if moves[i].piece_moved[1] != "K":  # move doesn't move king so it must block or capture
+                        if not (moves[i].end_row,
+                                moves[i].end_col) in valid_squares:  # move doesn't block or capture piece
+                            moves.remove(moves[i])
+            else:  # double check, king has to move
+                self.get_king_moves(king_row, king_col, moves)
+        else:   #not in check, all moves are fine
+            moves = self.get_all_moves()
+            if self.is_white_turn:
+                self.get_castle_moves(self.white_king_location[0], self.white_king_location[1], moves)
+            else:
+                self.get_castle_moves(self.black_king_location[0], self.black_king_location[1], moves)
 
-            #now we need to undo our algorithm so that the moves made dont actually occur on the board
-            self.is_white_turn = not self.is_white_turn
-            self.undo_move()    #undoes each move as it occurs. Reminder: undo_move deletes the last move in the move log
-
+        #End of game handlers
         if len(moves) == 0: #after the filtering algorithm, if there are zero legal moves, then it is either checkmate or stalemate
             if self.in_check(): #if in check
                 self.is_checkmate = True    #then it's checkmate
@@ -195,30 +238,156 @@ class Game_State:
 
         return moves
 
-    #looks at the whole board, and generates all the possible moves that a given side can make. This includes pieces moving while pinned, kings moving into check, etc.
-    def get_possible_moves_MODIFIED(self):
+    """
+    Function that gets ALL the moves in a particular position, without considering checks
+    """
+    def get_all_moves(self):
         moves = []
-        for r in range(len(self.board)): #iterates through the rows
-            for c in range(len(self.board[r])):  #iterates through the columns in a given row
-                color = self.board[r][c][0]  #extracts the first character of a given string in the 8x8 array. That returns the COLOR of the piece at any particular square.
-                if (color == 'w' and self.is_white_turn) or (color == 'b' and not self.is_white_turn):   #if color of piece matches who's turn it is, then look at that piece as a valid piece to move
-                    piece = self.board[r][c][1] #extracts the second character of the string -- that gives the piece type, i.e. 'P', 'R', 'Q', etc.
-                    if piece == 'P':   #if piece is a pawn
-                        self.get_pawn_moves(r, c, moves)    #gets all possible pawn moves
-                    elif piece == 'R': 
-                        self.get_rook_moves(r, c, moves)
-                    elif piece == 'Q':
-                        self.get_queen_moves(r, c, moves)
-                    elif piece == 'N':
-                        self.get_knight_moves(r, c, moves)
-                    elif piece == 'B':
-                        self.get_bishop_moves(r, c, moves)
-                    elif piece == 'K':
-                        self.get_king_moves(r, c, moves)
+        for row in range(len(self.board)):
+            for col in range(len(self.board[row])):
+                turn = self.board[row][col][0]
+                if (turn == "w" and self.is_white_turn) or (turn == "b" and not self.is_white_turn):
+                    piece = self.board[row][col][1]
+                    self.move_functions[piece](row, col, moves)  # calls appropriate move function based on piece type
         return moves
 
-    #Getters for piece movements: Pawn, Rook, Queen, Kight, Bishop King
-    #Adds move objects to a list of moves. Does not handle checks, pins, en passant, or castling
+
+
+    """
+    Check Handlers
+    """
+
+    #Function that checks to see whether king is in check
+    def in_check(self):
+        if self.is_white_turn:  #if it's white to move
+            return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])  #checks wehther the white king's location is being attacked
+        else:   #if black to move
+            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])   #checks whether the black king's location is being attacked
+
+    #Function that returns lists of the squares being pinned and the squares putting the king in check
+    def get_pins_and_checks(self):
+        pins = []  # squares pinned and the direction they're pinned from
+        checks = []  # squares where enemy is applying a check
+        in_check = False
+        if self.is_white_turn:
+            enemy_color = "b"
+            ally_color = "w"
+            start_row = self.white_king_location[0]
+            start_col = self.white_king_location[1]
+        else:
+            enemy_color = "w"
+            ally_color = "b"
+            start_row = self.black_king_location[0]
+            start_col = self.black_king_location[1]
+        
+        #Check outward from the king, looking for pins and checks. Keep track of pins.
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)) #unit vector list of directions
+        for j in range(len(directions)):
+            direction = directions[j]
+            possible_pin = ()   #reset possible pins
+            for i in range(1, 8):   #a square that is i units away from the king in a given direction
+                end_row = start_row + direction[0] * i  #get end row and end column
+                end_col = start_col + direction[1] * i
+                if 0 <= end_row <= 7 and 0 <= end_col <= 7: #if the square is on the board
+                    end_piece = self.board[end_row][end_col]    #get piece at end square
+                    if end_piece[0] == ally_color and end_piece[1] != "K":  #if square contains piece of allied color
+                        if possible_pin == ():  # first allied piece could be pinned
+                            possible_pin = (end_row, end_col, direction[0], direction[1])
+                        else:  # 2nd allied piece - no check or pin from this direction
+                            break
+                    elif end_piece[0] == enemy_color:
+                        enemy_type = end_piece[1]
+                        # 5 possibilities in this complex conditional
+                        # 1.) orthogonally away from king and piece is a rook
+                        # 2.) diagonally away from king and piece is a bishop
+                        # 3.) 1 square away diagonally from king and piece is a pawn
+                        # 4.) any direction and piece is a queen
+                        # 5.) any direction 1 square away and piece is a king
+                        if (0 <= j <= 3 and enemy_type == "R") or (4 <= j <= 7 and enemy_type == "B") or (
+                                i == 1 and enemy_type == "p" and (
+                                (enemy_color == "w" and 6 <= j <= 7) or (enemy_color == "b" and 4 <= j <= 5))) or (
+                                enemy_type == "Q") or (i == 1 and enemy_type == "K"):
+                            if possible_pin == ():  # no piece blocking, so check
+                                in_check = True
+                                checks.append((end_row, end_col, direction[0], direction[1]))
+                                break
+                            else:  # piece blocking so pin
+                                pins.append(possible_pin)
+                                break
+                        else:  # enemy piece not applying checks
+                            break
+                else:
+                    break  # off board
+        # check for knight checks
+        knight_moves = ((-2, -1), (-2, 1), (-1, 2), (1, 2), (2, -1), (2, 1), (-1, -2), (1, -2))
+        for move in knight_moves:
+            end_row = start_row + move[0]
+            end_col = start_col + move[1]
+            if 0 <= end_row <= 7 and 0 <= end_col <= 7:
+                end_piece = self.board[end_row][end_col]
+                if end_piece[0] == enemy_color and end_piece[1] == "N":  # enemy knight attacking a king
+                    in_check = True
+                    checks.append((end_row, end_col, move[0], move[1]))
+        return in_check, pins, checks
+
+    """
+    Castling Handlers.
+    Four conditions we need to work with:
+    1 - King cannot be in check
+    2 - King cannot move through check
+    3 - King cannot land in check
+    4 - It must be both the king and the rook's first move of the game. That's why kingside and queenside castling are separate variables
+    """
+
+    #Function that updates castling rights based on move made
+    def update_castle_rights(self, move):
+        if(move.piece_moved == 'wK'):    #If the white king was moved
+            self.current_castle_rights.white_kingside_castle = False    #set kingside castling rights to false
+            self.current_castle_rights.white_queenside_castle = False   #set queenside castling rights to false
+        elif(move.piece_moved == 'bK'):    #If the black king was moved
+            self.current_castle_rights.black_kingside_castle = False    #set kingside castling rights to false
+            self.current_castle_rights.black_queenside_castle = False   #set queenside castling rights to false
+        elif(move.piece_moved == 'wR'):   #If pieced move was a white rook
+            if(move.start_row == 7):      #If rook's starting row is 7
+                if(move.start_col == 0):  #left rook
+                    self.current_castle_rights.white_queenside_castle = False   #set queenside castling rights to false
+                elif(move.start_col == 7): #right rook
+                    self.current_castle_rights.white_kingside_castle = False
+        elif(move.piece_moved == 'bR'):   #If pieced move was a white rook
+            if(move.start_row == 0):      #If rook's starting row is 7
+                if(move.start_col == 0):  #left rook
+                    self.current_castle_rights.black_queenside_castle = False   #set queenside castling rights to false
+                elif(move.start_col == 7): #right rook
+                    self.current_castle_rights.black_kingside_castle = False
+
+    #Function that generates all valid castle moves for the king at (row, column). Adds them to the move list
+    def get_castle_moves(self, row, col, moves):
+        if self.square_under_attack(row, col):
+            return  #can't castle if in check
+        if((self.is_white_turn and self.current_castle_rights.white_kingside_castle) or (not self.is_white_turn and self.current_castle_rights.black_kingside_castle)): #if it's white turn and white has kingside castle rights OR it's black's turn and black has kingside castle rights
+            self.get_kingside_castle_moves(row, col, moves)    #gets kingside castle moves
+        if((self.is_white_turn and self.current_castle_rights.white_queenside_castle) or (not self.is_white_turn and self.current_castle_rights.black_queenside_castle)): #if it's white turn and white has queenside castle rights OR it's black's turn and black has queenside castle rights
+            self.get_queenside_castle_moves(row, col, moves)      #gets queenside castle moves
+
+    
+    #generates kingside castle moves
+    def get_kingside_castle_moves(self, row, column, moves):
+        if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
+            if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
+                moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
+    #generates queenside castle moves
+    def get_queenside_castle_moves(self, row, column, moves):
+        if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
+             if (not self.square_under_attack(row, column-1) and not self.square_under_attack(row, column - 2)):   #if squares one and two columns over from the king are not being attacked. DOn't have to check square three over, because the king does not pass thru that square
+                moves.append(Move((row, column), (row, column - 2), self.board, is_castle_move = True))
+
+
+
+    """
+    Getters for piece movements. Does not handly checks, pins, enpassant, promotion, or castling.
+    """
+
+    #pawn
     def get_pawn_moves(self, row, column, moves):   #gets all possible moves for the pawns. Copy-paste evan's code with some slight modifications
         
         enpassant_direction = "" #makes sure that a pawn can only enpassant in to take the pawn that moved last
@@ -295,7 +464,7 @@ class Game_State:
                     if can_enpassant and enpassant_direction == "right":
                         moves.append(Move((row, column), (row + 1, column + 1), self.board, is_enpassant_move = True))   #adds a new diagonal right enpassant capture to the list of moves
                 
-
+    #rook
     def get_rook_moves(self, row, column, moves):   #gets all possible moves for the rook. Copy and paste evan's code with some slight mdifications
         #Note: unlike pawn moves, the color of the rook does not affect its movement possibilities
 
@@ -320,10 +489,12 @@ class Game_State:
                 else: #else off board
                     break   #go to the next direction
 
+    #queen
     def get_queen_moves(self, row, column, moves):  #gets all possible moves for the queen. Queen is literally rook + bishop tho lol
         self.get_rook_moves(row, column, moves)   #gets all possible rook moves
         self.get_bishop_moves(row, column, moves) #gets all possible queen moves
 
+    #knight
     def get_knight_moves(self, row, column, moves): #gets all possible moves for the knight
         directions = ((-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2))   #tuple in form (row, column). up/left, up/right, down/left, down/right, left/up, right/up, left/down, right/down
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
@@ -340,7 +511,7 @@ class Game_State:
                 elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
     
-
+    #bishop
     def get_bishop_moves(self, row, column, moves): #gets all possible moves for the bishop
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))   #unit vectors for the diagonals: up/left, up/right, down/left, down/right
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
@@ -363,7 +534,7 @@ class Game_State:
                 else: #off board
                     break
     
-
+    #king
     def get_king_moves(self, row, column, moves):   #gets all possible moves for the king
         #other than the direction vectors, this method is literally the same as the knight moves method
         directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)) #possible king moves: up/left, up, up/right, left, right, down/left, down, down/right
@@ -379,56 +550,22 @@ class Game_State:
                 if(self.board[end_row][end_column][0] != ally_color):    #if ending square does not contain a piece of the allied color                 
                     moves.append(Move((row, column), (end_row, end_column), self.board))    #add move to moves list
             
-    #Castling Handlers.
-    #Four conditions we need to work with:
-    #1 - King cannot be in check
-    #2 - King cannot move through check
-    #3 - King cannot land in check
-    #4 - It must be both the king and the rook's first move of the game. That's why kingside and queenside castling are separate variables
     
-    #Updates castling rights given the move
-    def update_castle_rights(self, move):
-        if(move.piece_moved == 'wK'):    #If the white king was moved
-            self.current_castle_rights.white_kingside_castle = False    #set kingside castling rights to false
-            self.current_castle_rights.white_queenside_castle = False   #set queenside castling rights to false
-        elif(move.piece_moved == 'bK'):    #If the black king was moved
-            self.current_castle_rights.black_kingside_castle = False    #set kingside castling rights to false
-            self.current_castle_rights.black_queenside_castle = False   #set queenside castling rights to false
-        elif(move.piece_moved == 'wR'):   #If pieced move was a white rook
-            if(move.start_row == 7):      #If rook's starting row is 7
-                if(move.start_col == 0):  #left rook
-                    self.current_castle_rights.white_queenside_castle = False   #set queenside castling rights to false
-                elif(move.start_col == 7): #right rook
-                    self.current_castle_rights.white_kingside_castle = False
-        elif(move.piece_moved == 'bR'):   #If pieced move was a white rook
-            if(move.start_row == 0):      #If rook's starting row is 7
-                if(move.start_col == 0):  #left rook
-                    self.current_castle_rights.black_queenside_castle = False   #set queenside castling rights to false
-                elif(move.start_col == 7): #right rook
-                    self.current_castle_rights.black_kingside_castle = False
 
-    #generate all valid castle moves for the king at (row, column) and add them to the list of moves
-    def get_castle_moves(self, row, column, moves, ally_color):
-        updated_check_status = (self.white_in_check and self.is_white_turn) or (self.black_in_check and not self.is_white_turn)
-        if(self.in_check() and updated_check_status):
-            print("king in check")
-            return #can't castle if in check
-        if((self.is_white_turn and self.current_castle_rights.white_kingside_castle) or (not self.is_white_turn and self.current_castle_rights.black_kingside_castle)): #if it's white turn and white has kingside castle rights OR it's black's turn and black has kingside castle rights
-            self.get_kingside_castle_moves(row, column, moves)    #gets kingside castle moves
-        if((self.is_white_turn and self.current_castle_rights.white_queenside_castle) or (not self.is_white_turn and self.current_castle_rights.black_queenside_castle)): #if it's white turn and white has queenside castle rights OR it's black's turn and black has queenside castle rights
-            self.get_queenside_castle_moves(row, column, moves)      #gets queenside castle moves
+    """
+    Helper Methods
+    """
+    #Function that determines whether a given square is under attack    
+    def square_under_attack(self, row, column):   
+        self.is_white_turn = not self.is_white_turn #looks at opponents moves
+        opponent_moves = self.get_all_moves()
+        self.is_white_turn = not self.is_white_turn #switches back perspective
+        for move in opponent_moves:
+            if (move.end_row == row and move.end_col == column): #if there exists a possible move that would end on the specified row and column, i.e. square is under attack
+                return True
+        return False
 
-    
-    #generates kingside castle moves
-    def get_kingside_castle_moves(self, row, column, moves):
-        if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
-            if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
-                moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
-    #generates queenside castle moves
-    def get_queenside_castle_moves(self, row, column, moves):
-        if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
-             if (not self.square_under_attack(row, column-1) and not self.square_under_attack(row, column - 2)):   #if squares one and two columns over from the king are not being attacked. DOn't have to check square three over, because the king does not pass thru that square
-                moves.append(Move((row, column), (row, column - 2), self.board, is_castle_move = True))
+
 
 
 #Castling Rights class. Creates objects with 4 boolean parameters indicating whether/how white and black can castle.

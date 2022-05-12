@@ -52,7 +52,7 @@ def evaluate(game_state):
             return CHECKMATE
 
     #Stalemate handler
-    elif game_state.is_stalemate:
+    elif game_state.is_draw:
         return STALEMATE
 
 
