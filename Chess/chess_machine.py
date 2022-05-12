@@ -45,8 +45,25 @@ class Game_State:
         #King location variables
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
         self.black_king_location = (0, 4)   #black king starts at row 0 col 4
+<<<<<<< HEAD
         
         #Castle Rights variables
+=======
+        self.is_checkmate = False
+        self.is_stalemate = False
+
+        self.white_in_check = False
+        self.black_in_check = False
+
+        #yeah sorry this is very inefficient and makes some lines of code pointless
+        #but it also prevents the issue of enabling castling at bad times so imma use it for now
+        self.cant_white_kingside = False
+        self.cant_white_queenside = False
+        self.cant_black_kingside = False
+        self.cant_black_queenside = False
+
+        #castling global variables. For more information see the heading above the Castle_Rights class
+>>>>>>> ca07b4692c1a7fa4ebc77f01af944a65c670b58a
         self.current_castle_rights = Castle_Rights(True, True, True, True)  #wks, wqs, bks, bqs all true at start of game
         self.castle_rights_log = [Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                                         self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle)]  #creates a list of castling_rights objects, taking a snapshot of the current castling rights state by creating a new Castle_Rights object 
