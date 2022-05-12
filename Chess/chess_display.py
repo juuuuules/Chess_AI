@@ -20,6 +20,11 @@ SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 #Do we need MAX_FPS variable?????
 IMAGES = {} #Creates a global images directory
 
+
+"""
+EVAN'S SHIT
+"""
+
 def reset_castle_rights(game_state):
     game_state.current_castle_rights.set_castle_rights(True, True, True, True)
     game_state.castle_rights_log.append([game_state.current_castle_rights])
@@ -74,6 +79,10 @@ def reset_castle_rights(game_state):
         #         game_state.current_castle_rights.white_kingside_castle = True
 
     game_state.castle_rights_log.append(game_state.current_castle_rights)
+
+"""
+END EVAN'S SHIT
+"""
 
 
 #Method that initializes a global directory of images. Minimize calling this method bc it takes a lot of computing time lol
