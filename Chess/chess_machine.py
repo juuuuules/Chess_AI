@@ -403,7 +403,7 @@ class Game_State:
     #pawn
     def get_pawn_moves(self, row, col, moves):   #gets all possible moves for the pawns. Copy-paste evan's code with some slight modifications
         
-        #Pin handler. If pawn is pinned, don't need to deal with its moves.
+        #Pin handler. Gets info about the pin
         piece_pinned = False
         pin_direction = ()
         for i in range(len(self.pins) - 1, -1, -1):
@@ -428,7 +428,7 @@ class Game_State:
         #Advance one square.
         if self.board[row + move_amount][col] == "--":
             
-            if not piece_pinned or pin_direction == (move_amount, -1):
+            if not piece_pinned or pin_direction == (move_amount, 0):
                 moves.append(Move((row, col), (row + move_amount, col), self.board))
 
                 #advance two squares
@@ -467,7 +467,7 @@ class Game_State:
 
         #Capture to the right
         if col + 1 <= 7:
-            if not piece_pinned or pin_direction == (move_amount, +1):
+            if not piece_pinned or pin_direction == (move_amount, 1):
                 if self.board[row + move_amount][col + 1][0] == enemy_color:
                     moves.append(Move((row, col), (row + move_amount, col + 1), self.board))
                 
@@ -522,15 +522,17 @@ class Game_State:
         for direction in directions:    #iterates through the directions: up, down, left, right
             for i in range(1, 8):   #iterates from 1 to 8
                 end_row = row + direction[0] * i       #sets the end row to be the start row PLUS i rows up or down. If the direction is (0, -1) or (0, 1), aka left or right, direction[0] will be zero and the row index will not change.
-                end_column = col + direction[1] * i     #sets the end column to be start column PLUS i columns left or right. If the direction is (-1, 0) or (1, 0), aka up or down, direction[1] will be zero and the column index will not change.
-                if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-                    if(self.board[end_row][end_column] == "--"):    #if ending square is empty
-                        moves.append(Move((row, col), (end_row, end_column), self.board))    #add that move to the list of moves
-                    elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains a piece of enemy color
-                        moves.append(Move((row, col), (end_row, end_column), self.board))    #add that move to the list of moves
-                        break   #break the inner for loop (the one with i) -- now that the rook has hit a piece, it can't go any further in this direction. Break tells the computer iterate to the next available direction
-                    else:       #if the square is a friendly piece
-                        break   #break the inner for loop for the same reasons as above
+                end_col = col + direction[1] * i     #sets the end column to be start column PLUS i columns left or right. If the direction is (-1, 0) or (1, 0), aka up or down, direction[1] will be zero and the column index will not change.
+                if(end_row >= 0 and end_row <= 7 and end_col >=0 and end_col <= 7):   #if ending square is within boundaries of the board
+                    if not piece_pinned or pin_direction == direction or pin_direction == (-direction[0], -direction[1]):
+                        end_piece = self.board[end_row][end_col]
+                        if end_piece == "--" :    #move to empty space
+                            moves.append(Move((row, col), (end_row, end_col), self.board))
+                        elif end_piece[0] == enemy_color:   #capture enemy piece
+                            moves.append(Move((row, col), (end_row, end_col), self.board))
+                            break
+                        else:   #ally piece
+                            break
                 else: #else off board
                     break   #go to the next direction
 
@@ -553,24 +555,23 @@ class Game_State:
         
         directions = ((-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2))   #tuple in form (row, column). up/left, up/right, down/left, down/right, left/up, right/up, left/down, right/down
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
-            enemy_color = 'b'
+            ally_color = 'w'
         else:
-            enemy_color = 'w'
-        
+            ally_color = 'b'
 
         for direction in directions:    #iterates over all the directions
             end_row = row + direction[0]    #sets the end row to be start row + the first term of a particular direction
-            end_column = col + direction[1]  #sets the end column to be start column + second term of a particular direction
-            if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-                if(self.board[end_row][end_column] == "--"):    #if ending square is empty
-                    moves.append(Move((row, col), (end_row, end_column), self.board))    #add move to moves list
-                elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
-                    moves.append(Move((row, col), (end_row, end_column), self.board))    #add move to moves list
+            end_col = col + direction[1]  #sets the end column to be start column + second term of a particular direction
+            if(end_row >= 0 and end_row <= 7 and end_col >=0 and end_col <= 7):   #if ending square is within boundaries of the board
+                if not piece_pinned:
+                    end_piece = self.board[end_row][end_col]
+                    if end_piece[0] != ally_color:  # so its either enemy piece or empty square
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
     
     #bishop
     def get_bishop_moves(self, row, col, moves): #gets all possible moves for the bishop
         
-        #Pin Handler
+        #Pin Handler. Get information about pin.
         piece_pinned = False
         pin_direction = ()
         for i in range(len(self.pins) - 1, -1, -1):
@@ -579,7 +580,6 @@ class Game_State:
                 pin_direction = (self.pins[i][2], self.pins[i][3])
                 self.pins.remove(self.pins[i])
                 break
-       # print(self.pins)
         
         directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))   #unit vectors for the diagonals: up/left, up/right, down/left, down/right
         if self.is_white_turn:  #sets the enemy color. If it's white to move, enemy color is black. Otherwise, it's white.
@@ -591,15 +591,17 @@ class Game_State:
         for direction in directions: #iterates over all the directions
             for i in range(1, 8):
                 end_row = row + direction[0] * i    #same as for the rook. sets the end row to be the start row PLUS i rows up or down.
-                end_column = col + direction [1] * i #sets the end column to be the start column PLUS i columns up or down
-                if(end_row >= 0 and end_row <= 7 and end_column >=0 and end_column <= 7):   #if ending square is within boundaries of the board
-                    if(self.board[end_row][end_column] == "--"):    #if ending square is empty
-                        moves.append(Move((row, col), (end_row, end_column), self.board))    #add move to moves list
-                    elif(self.board[end_row][end_column][0] == enemy_color):    #if ending square contains piece of enemy color
-                        moves.append(Move((row, col), (end_row, end_column), self.board))    #add move to move list
-                        break   #same as for the Rook. Break the inner for loop to go to a new direction, now that the current diagonal has been found to be blocked off by a piece
-                    else: #friendly piece
-                        break   #break inner loop for same reason. Diagonal is blocked off. Tells computer to go to new direction.
+                end_col = col + direction [1] * i #sets the end column to be the start column PLUS i columns up or down
+                if(end_row >= 0 and end_row <= 7 and end_col >=0 and end_col <= 7):   #if ending square is within boundaries of the board
+                    if not piece_pinned or pin_direction == direction or pin_direction == (-direction[0], -direction[1]):
+                        end_piece = self.board[end_row][end_col]
+                        if end_piece == "--" :                          #move to empty space
+                            moves.append(Move((row, col), (end_row, end_col), self.board))
+                        elif end_piece[0] == enemy_color:               #capture enemy piece
+                            moves.append(Move((row, col), (end_row, end_col), self.board))
+                            break
+                        else:   #ally piece
+                            break
                 else: #off board
                     break
     
