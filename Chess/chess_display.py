@@ -117,11 +117,12 @@ def main():
     game_over = False
 
     player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
     while running:
+
 
         is_human_turn = (game_state.is_white_turn and player_one) or (not game_state.is_white_turn and player_two)
 
@@ -181,6 +182,7 @@ def main():
                         animate = False
                         square_selected = ()    #reset user clicks
                         player_clicks = []      #resets user clicks
+                    reset_castle_rights(game_state)
 
                 if event.key == p.K_f:
                     print(game_state.current_castle_rights.white_kingside_castle)
