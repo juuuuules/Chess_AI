@@ -1,4 +1,57 @@
 """
+Adding alpha-beta pruning to minimax. See this video for more info: https://www.youtube.com/watch?v=l-hh51ncgDI&t=497
+"""
+
+def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
+    best_move = None
+    if depth == 0 or game_state.is_checkmate or game_state.is_draw:
+        return evaluate(game_state), best_move
+    
+    if is_white_turn:
+        max_score = -CHECKMATE
+
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+
+            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
+
+            if score > max_score:
+                max_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+
+            game_state.undo_move()
+
+    else:
+        min_score = CHECKMATE
+
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+
+            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
+
+            if score < min_score:
+                min_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+            game_state.undo_move()
+        return min_score, best_move
+        
+
+
+
+
+
+
+
+
+
+
+
+
+"""
 
 
 Changes to undo_move:
