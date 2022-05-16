@@ -117,8 +117,8 @@ def main():
 
     game_over = False
 
-    player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_one = False   #if a human is playing white than this is true. If an AI is playing white, this is false
+    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
@@ -199,6 +199,7 @@ def main():
         
         #logic for AI move finder
         if not game_over and not is_human_turn:
+
             ai_move = chess_evaluator.find_best_move(game_state, valid_moves)
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
