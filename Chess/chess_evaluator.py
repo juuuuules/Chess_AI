@@ -16,7 +16,7 @@ Global variables.
 """
 CHECKMATE = 10000
 STALEMATE = 0
-MAX_DEPTH = 2
+MAX_DEPTH = 3
 
 
 

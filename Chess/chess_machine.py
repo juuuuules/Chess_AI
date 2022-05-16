@@ -385,11 +385,15 @@ class Game_State:
     
     #generates kingside castle moves
     def get_kingside_castle_moves(self, row, column, moves):
+        if column + 2 > 7:
+            return
         if self.board[row][column+1] == '--' and self.board[row][column+2] == '--':   #if squares one and two columns over from the king are empty
             if (not self.square_under_attack(row, column+1) and not self.square_under_attack(row, column + 2)):   #if squares one and two columns over from the king are not being attacked
                 moves.append(Move((row, column), (row, column + 2), self.board, is_castle_move = True))
     #generates queenside castle moves
     def get_queenside_castle_moves(self, row, column, moves):
+        if column - 2 < 0:
+            return
         if self.board[row][column - 1] == '--' and self.board[row][column - 2] == '--' and self.board[row][column - 3] == '--':
              if (not self.square_under_attack(row, column-1) and not self.square_under_attack(row, column - 2)):   #if squares one and two columns over from the king are not being attacked. DOn't have to check square three over, because the king does not pass thru that square
                 moves.append(Move((row, column), (row, column - 2), self.board, is_castle_move = True))

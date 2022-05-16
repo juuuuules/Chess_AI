@@ -122,6 +122,7 @@ def main():
     running = True
     while running:
 
+
         is_human_turn = (game_state.is_white_turn and player_one) or (not game_state.is_white_turn and player_two)
 
         for event in p.event.get(): #iterates through all the "events" -- includes clicks, button presses, etc
@@ -180,6 +181,7 @@ def main():
                         animate = False
                         square_selected = ()    #reset user clicks
                         player_clicks = []      #resets user clicks
+                    reset_castle_rights(game_state)
 
                 if event.key == p.K_f:
                     print(game_state.current_castle_rights.white_kingside_castle)
@@ -326,9 +328,19 @@ def animate_move(move, screen, board, clock):
         clock.tick(60)  #framerate
 
 def draw_text(screen, text):
-    font = p.font.SysFont("Helvetica", 80, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+    if os.path.isdir("Chess"):
+        font = p.font.SysFont("Helvetica", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+    else:
+        font = p.font.SysFont("Helvetica", 80, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+
     text_object = font.render(text, True, 0, (255, 0, 255))
-    text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
+    
+    if os.path.isdir("Chess"):
+        WIDTH = HEIGHT = 500
+        text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 3, HEIGHT // 2)
+    else:
+        text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
+
     screen.blit(text_object, text_location) #blits the text_object at the proper location.
 
 main() #calls the main method
