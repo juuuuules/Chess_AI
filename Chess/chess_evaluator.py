@@ -56,7 +56,8 @@ Best move functions.
 
 #Helper method. Makes first minimax call.
 def minimax(game_state, valid_moves):
-    return minimax_algorithm(game_state, valid_moves, MAX_DEPTH, game_state.is_white_turn)[1]
+    game_state_clone = copy.deepcopy(game_state)
+    return minimax_algorithm(game_state_clone, valid_moves, MAX_DEPTH, game_state_clone.is_white_turn)[1]
 
 
 #return a score, best move at a given depth
