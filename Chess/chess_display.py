@@ -24,6 +24,7 @@ IMAGES = {} #Creates a global images directory
 
 """
 EVAN'S SHIT
+"""
 
 def reset_castle_rights(game_state):
     game_state.current_castle_rights.set_castle_rights(True, True, True, True)
@@ -80,6 +81,7 @@ def reset_castle_rights(game_state):
 
     game_state.castle_rights_log.append(game_state.current_castle_rights)
 
+"""
 END EVAN'S SHIT
 """
 
