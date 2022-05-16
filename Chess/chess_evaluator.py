@@ -1,4 +1,4 @@
-
+import copy
 
 from lib2to3.refactor import get_all_fix_names
 import random
