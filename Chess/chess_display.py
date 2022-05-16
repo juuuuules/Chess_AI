@@ -198,8 +198,8 @@ def main():
                     animate = False
         
         #logic for AI move finder
-        if not is_human_turn:
-            ai_move = chess_evaluator.minimax(game_state, valid_moves)
+        if not game_over and not is_human_turn:
+            ai_move = chess_evaluator.find_best_move(game_state, valid_moves)
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)

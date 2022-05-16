@@ -55,48 +55,44 @@ Best move functions.
 #Minimax Algorithm
 
 #Helper method. Makes first minimax call.
-def minimax(game_state, valid_moves):
-    return minimax_algorithm(game_state, valid_moves, MAX_DEPTH, game_state.is_white_turn)[1]
-
-
-#return a score, best move at a given depth
-def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
+def find_best_move(game_state, valid_moves):
+    global best_move
     best_move = None
+
+    random.shuffle(valid_moves)
+
+    minimax(game_state, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)
+    return best_move
+
+
+#return a score at a given depth
+def minimax(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+    global best_move
+
     if depth == 0:
-        return evaluate(game_state), best_move
+        return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
     
-    if is_white_turn:
-        max_score = -CHECKMATE
+    #TO DO - Implement move ordering
 
-        for move in valid_moves:
-            game_state.make_move(move)
-            next_moves = game_state.get_valid_moves()
+    max_score = -CHECKMATE
+    for move in valid_moves:
+        game_state.make_move(move)
+        next_moves = game_state.get_valid_moves()
 
-            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
+        score = -minimax(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
 
-            if score > max_score:
-                max_score = score
-                if depth == MAX_DEPTH:
-                    best_move = move
+        if score > max_score:
+            max_score = score
+            if depth == MAX_DEPTH:
+                best_move = move
 
-            game_state.undo_move()
+        game_state.undo_move()
 
-    else:
-        min_score = CHECKMATE
-
-        for move in valid_moves:
-            game_state.make_move(move)
-            next_moves = game_state.get_valid_moves()
-
-            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
-
-            if score < min_score:
-                min_score = score
-                if depth == MAX_DEPTH:
-                    best_move = move
-            game_state.undo_move()
-        return min_score, best_move
-        
+        if max_score > alpha:
+            alpha = max_score
+        if alpha >= beta:
+            break
+    return max_score
 
 
 #Function that makes a random move
