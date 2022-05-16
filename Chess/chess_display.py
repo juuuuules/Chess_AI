@@ -1,6 +1,7 @@
 
 # Main driver file - responsible for handling user input and displaying current GameState object
 
+from pickle import FALSE
 import pygame as p
 from pygame.constants import KEYDOWN, K_z
 import chess_machine, chess_evaluator
@@ -23,7 +24,6 @@ IMAGES = {} #Creates a global images directory
 
 """
 EVAN'S SHIT
-"""
 
 def reset_castle_rights(game_state):
     game_state.current_castle_rights.set_castle_rights(True, True, True, True)
@@ -80,7 +80,6 @@ def reset_castle_rights(game_state):
 
     game_state.castle_rights_log.append(game_state.current_castle_rights)
 
-"""
 END EVAN'S SHIT
 """
 
@@ -117,7 +116,7 @@ def main():
     game_over = False
 
     player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
@@ -202,7 +201,7 @@ def main():
             game_state.make_move(ai_move)
             move_made = True
             animate = True
-            reset_castle_rights(game_state)
+#            reset_castle_rights(game_state)
 
 
 

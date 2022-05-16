@@ -81,8 +81,6 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
 
             game_state.undo_move()
 
-        return max_score, best_move
-
     else:
         min_score = CHECKMATE
 
