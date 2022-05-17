@@ -73,9 +73,11 @@ def minimax_algorithm(game_state, valid_moves, depth, is_white_turn):
             game_state.make_move(move)
             next_moves = game_state.get_valid_moves()
 
-            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)[0]
+            score = minimax_algorithm(game_state, next_moves, depth - 1, not is_white_turn)
+            tru_score = score[0]
+            print(tru_score)
 
-            if score > max_score:
+            if tru_score > max_score:
                 max_score = score
                 if depth == MAX_DEPTH:
                     best_move = move
