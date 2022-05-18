@@ -3,6 +3,7 @@
 from lib2to3.refactor import get_all_fix_names
 import random
 from typing import Counter
+import copy
 
 
 """
@@ -57,13 +58,14 @@ Best move functions.
 
 #Helper method. Makes first minimax call.
 def find_best_move(game_state, valid_moves):
+    game_state_clone = copy.deepcopy(game_state)        #copy the gamestate
     global best_move, counter
     best_move = None
 
   #  random.shuffle(valid_moves)
 
     counter = 0    #for testing. Number of calls for minimax method
-    minimax_alpha_beta_no_loop(game_state, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)
+    minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state_clone.is_white_turn else -1)
     print("minimax call number is " + str(counter)) #for testing
 
     return best_move
