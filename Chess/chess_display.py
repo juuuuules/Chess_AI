@@ -168,12 +168,10 @@ def main():
         #makes the text above the boxes
 
         screen.fill((255, 0, 0))
+        font = p.font.SysFont("Helvetica", 20)
+
         p.draw.rect(screen, (255, 255, 255), p.Rect(100, 200, 100, 100))
         p.draw.rect(screen, (0, 0, 0), p.Rect(500, 200, 100, 100))
-        p.display.flip()
-
-        screen.fill((255, 0, 0))
-        font = p.font.SysFont("Helvetica", 20)
 
         white_text = font.render("play as white", True, (0, 0, 0))
         black_text = font.render("play as black", True, (0, 0, 0))
@@ -182,7 +180,7 @@ def main():
         black_text_rect = black_text.get_rect()
 
         white_text_rect.center = (150, 170)
-        black_text_rect.center = (480, 170)
+        black_text_rect.center = (550, 170)
 
         screen.blit(white_text, white_text_rect)
         screen.blit(black_text, black_text_rect)
@@ -190,7 +188,8 @@ def main():
 
         for event in p.event.get():
             if event.type == p.QUIT:
-                in_menu = False
+                in_choose_color_menu = False
+                quit()
 
             if event.type == p.MOUSEBUTTONUP: #get mouse position
                 x_pos = p.mouse.get_pos()[0]
