@@ -120,6 +120,98 @@ def main():
     player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
     player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
 
+    in_menu = True
+    in_choose_color_menu = False
+
+    while in_menu: #create the menu
+
+        #this just adds the text above the boxes saying what they do
+        screen.fill((255, 0, 0))
+        font = p.font.SysFont("Helvetica", 20)
+
+        sandbox_text = font.render("sandbox", True, (0, 0, 0))
+        against_computer_text = font.render("play against computer", True, (0, 0, 0))
+
+        sandbox_text_rect = sandbox_text.get_rect()
+        against_computer_text_rect = sandbox_text.get_rect()
+
+        sandbox_text_rect.center = (150, 170)
+        against_computer_text_rect.center = (480, 170)
+
+        screen.blit(sandbox_text, sandbox_text_rect)
+        screen.blit(against_computer_text, against_computer_text_rect)
+
+        p.draw.rect(screen, (0, 255, 0), p.Rect(100, 200, 100, 100))
+        p.draw.rect(screen, (0, 0, 255), p.Rect(500, 200, 100, 100))
+        p.display.flip()
+
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                in_menu = False
+
+            if event.type == p.MOUSEBUTTONUP: #get mouse position
+                x_pos = p.mouse.get_pos()[0]
+                y_pos = p.mouse.get_pos()[1]
+
+                if (x_pos < 200 and x_pos > 100) and (y_pos < 300 and y_pos > 200): #check if green box is clicked
+                    player_one = True
+                    player_two = True
+                    in_menu = False
+                    #set it to sandbox mode
+
+                if (x_pos < 600 and x_pos > 500) and (y_pos < 300 and y_pos > 200): #check if blue box is clicked
+                    in_menu = False
+                    in_choose_color_menu = True
+                    #bring it to the select color phase
+
+    while in_choose_color_menu: #create the choose color menu
+        #makes the text above the boxes
+
+        screen.fill((255, 0, 0))
+        p.draw.rect(screen, (255, 255, 255), p.Rect(100, 200, 100, 100))
+        p.draw.rect(screen, (0, 0, 0), p.Rect(500, 200, 100, 100))
+        p.display.flip()
+
+        screen.fill((255, 0, 0))
+        font = p.font.SysFont("Helvetica", 20)
+
+        white_text = font.render("play as white", True, (0, 0, 0))
+        black_text = font.render("play as black", True, (0, 0, 0))
+
+        white_text_rect = white_text.get_rect()
+        black_text_rect = black_text.get_rect()
+
+        white_text_rect.center = (150, 170)
+        black_text_rect.center = (480, 170)
+
+        screen.blit(white_text, white_text_rect)
+        screen.blit(black_text, black_text_rect)
+
+
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                in_menu = False
+
+            if event.type == p.MOUSEBUTTONUP: #get mouse position
+                x_pos = p.mouse.get_pos()[0]
+                y_pos = p.mouse.get_pos()[1]
+
+                if (x_pos < 200 and x_pos > 100) and (y_pos < 300 and y_pos > 200): #check if left box is clicked
+                    player_one = True
+                    player_two = False
+                    in_choose_color_menu = False
+                    #have player play as white
+
+                if (x_pos < 600 and x_pos > 500) and (y_pos < 300 and y_pos > 200): #check if right box is clicked
+                    player_one = False
+                    player_two = True
+                    in_choose_color_menu = False
+                    #have player play as black
+        p.display.flip()
+    
+    
+    
+
     #Run until user asks to quit
     running = True
     while running:
