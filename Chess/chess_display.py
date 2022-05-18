@@ -345,6 +345,7 @@ def draw_text(screen, text):
         WIDTH = HEIGHT = 500
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 3, HEIGHT // 2)
     else:
+        WIDTH = HEIGHT = 700
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
 
     screen.blit(text_object, text_location) #blits the text_object at the proper location.

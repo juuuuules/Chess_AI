@@ -18,7 +18,7 @@ Global variables.
 """
 CHECKMATE = 10000
 STALEMATE = 0
-MAX_DEPTH = 2
+MAX_DEPTH = 3
 
 
 
@@ -45,8 +45,11 @@ def evaluate(game_state):
         for square in row:
             if square[0] == 'w':
                 score += piece_score[square[1]]     #adds value of piece at given square if the piece is white
-            if square[1] == 'b':
+            if square[0] == 'b':
                 score -= piece_score[square[1]]     #subtracts value of piece at given quare if the piece is black
+    
+    if score != 40:
+        print(score)
     return score
         
 
@@ -65,7 +68,7 @@ def find_best_move(game_state, valid_moves):
   #  random.shuffle(valid_moves)
 
     counter = 0    #for testing. Number of calls for minimax method
-    minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state_clone.is_white_turn else -1)
+    minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
     print("minimax call number is " + str(counter)) #for testing
 
     return best_move
@@ -175,8 +178,9 @@ def minimax_alpha_beta_no_loop(game_state, valid_moves, depth, alpha, beta, is_w
             if score < min_score:
                 min_score = score
                 if depth == MAX_DEPTH:
+                 
                     best_move = move
-          
+            
             game_state.undo_move()
 
             beta = min(beta, score)

@@ -738,6 +738,9 @@ class Move():
     def get_chess_notation(self):
         return self.get_rank_file(self.start_row, self.start_col) + self.get_rank_file(self.end_row, self.end_col)  #creates a string that is a concatenation of starting square and ending square in chess notation. E.g. "e4e5"
 
+    def __repr__(self):
+        return self.get_chess_notation()
+
     #Helper function. Gets  rank and file given row and column.
     def get_rank_file(self, row, col):
         return self.cols_to_files[col] + self.rows_to_ranks[row]    #returns the file corresponding to the column "col" + the rank corresponding to the row "row". File then rank, because thats how chess notation works
