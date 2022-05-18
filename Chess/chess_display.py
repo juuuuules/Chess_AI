@@ -117,8 +117,8 @@ def main():
 
     game_over = False
 
-    player_one = False   #if a human is playing white than this is true. If an AI is playing white, this is false
-    player_two = True  #if a human is playing black than this is true. If an AI is playing black, this is false
+    player_one = True   #if a human is playing white than this is true. If an AI is playing white, this is false
+    player_two = False  #if a human is playing black than this is true. If an AI is playing black, this is false
 
     #Run until user asks to quit
     running = True
@@ -323,6 +323,9 @@ def animate_move(move, screen, board, clock):
 
         #draw captured piece onto rectangle
         if move.piece_captured != '--':
+            if move.is_enpassant_move:
+                en_passant_row = move.end_row + 1 if move.piece_captured[0] == 'b' else move.end_row - 1
+                end_square = p.Rect(move.end_col*SQ_SIZE, en_passant_row*SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.piece_captured], end_square)
         
         #draw moving piece
