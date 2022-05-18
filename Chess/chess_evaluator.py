@@ -2,6 +2,7 @@
 
 from lib2to3.refactor import get_all_fix_names
 import random
+from typing import Counter
 
 
 """
@@ -16,7 +17,7 @@ Global variables.
 """
 CHECKMATE = 10000
 STALEMATE = 0
-MAX_DEPTH = 3
+MAX_DEPTH = 2
 
 
 
@@ -56,18 +57,23 @@ Best move functions.
 
 #Helper method. Makes first minimax call.
 def find_best_move(game_state, valid_moves):
-    global best_move
+    global best_move, counter
     best_move = None
 
-    random.shuffle(valid_moves)
+  #  random.shuffle(valid_moves)
 
-    minimax(game_state, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)
+    counter = 0    #for testing. Number of calls for minimax method
+    minimax_alpha_beta_no_loop(game_state, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)
+    print("minimax call number is " + str(counter)) #for testing
+
     return best_move
 
 
 #return a score at a given depth
-def minimax(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
-    global best_move
+def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+    global best_move, counter
+
+    counter += 1
 
     if depth == 0:
         return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
@@ -79,7 +85,7 @@ def minimax(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
         game_state.make_move(move)
         next_moves = game_state.get_valid_moves()
 
-        score = -minimax(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
+        score = -minimax_alpha_beta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
 
         if score > max_score:
             max_score = score
@@ -93,6 +99,89 @@ def minimax(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
         if alpha >= beta:
             break
     return max_score
+
+
+def minimax(game_state, valid_moves, depth, is_white_turn):
+    global best_move, counter
+    counter += 1
+
+    if depth == 0:
+        return evaluate(game_state)
+    
+    if is_white_turn:
+        max_score = -CHECKMATE
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+
+            score = minimax(game_state, next_moves, depth - 1, False)
+            if score > max_score:
+                max_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+            
+            game_state.undo_move()
+        return max_score
+    
+    else:
+        min_score = CHECKMATE
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+            score = minimax(game_state, next_moves, depth - 1, True)
+            if score < min_score:
+                min_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+            game_state.undo_move()
+        return min_score
+
+
+def minimax_alpha_beta_no_loop(game_state, valid_moves, depth, alpha, beta, is_white_turn):
+    global best_move, counter
+    counter += 1
+
+    if depth == 0:
+        return evaluate(game_state)
+    
+    if is_white_turn:
+        max_score = -CHECKMATE
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+
+            score = minimax_alpha_beta_no_loop(game_state, next_moves, depth - 1, alpha, beta, False)
+            if score > max_score:
+                max_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+
+            game_state.undo_move()
+
+            alpha = max(alpha, score)
+            if beta <= alpha:
+                break
+
+        return max_score
+    
+    else:
+        min_score = CHECKMATE
+        for move in valid_moves:
+            game_state.make_move(move)
+            next_moves = game_state.get_valid_moves()
+            score = minimax_alpha_beta_no_loop(game_state, next_moves, depth - 1, alpha, beta, True)
+            if score < min_score:
+                min_score = score
+                if depth == MAX_DEPTH:
+                    best_move = move
+          
+            game_state.undo_move()
+
+            beta = min(beta, score)
+            if beta <= alpha:
+                break
+
+        return min_score
 
 
 #Function that makes a random move
