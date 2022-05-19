@@ -473,7 +473,7 @@ class Game_State:
         if col + 1 <= 7:
             if not piece_pinned or pin_direction == (move_amount, 1):
                 if self.board[row + move_amount][col + 1][0] == enemy_color:
-                    moves.append(Move((row, col), (row + move_amount, col - 1), self.board))
+                    moves.append(Move((row, col), (row + move_amount, col + 1), self.board))
                 
                 #enpassant to the right
                 if (row + move_amount, col + 1) == self.enpassant_possible:
