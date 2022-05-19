@@ -2,6 +2,7 @@
 
 from lib2to3.refactor import get_all_fix_names
 import random
+from tkinter.tix import MAX
 from typing import Counter
 import copy
 
@@ -67,7 +68,8 @@ def find_best_move(game_state, valid_moves):
 
     counter = 0    #for testing. Number of calls for minimax method
  #   minimax(game_state_clone, valid_moves, MAX_DEPTH, game_state.is_white_turn)
-    minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
+    minimax_alpha_beta(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)    
+ #   minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
     print("minimax call number is " + str(counter)) #for testing
 
     return best_move
