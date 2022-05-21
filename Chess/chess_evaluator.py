@@ -349,7 +349,7 @@ def sort_moves(game_state, valid_moves):
         move = valid_moves[i]
         if(move.is_capture and piece_score[move.piece_moved[1]] < piece_score[move.piece_captured[1]]):
             rating += 100
-        if(move.is_capture and piece_score[move.piece_moved[1]] < piece_score[move.piece_captured[1]]):
+        if(move.is_capture and piece_score[move.piece_moved[1]] > piece_score[move.piece_captured[1]]):
             rating += 50
         if move.is_pawn_promotion:
             rating += 200
