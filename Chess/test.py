@@ -1,12 +1,14 @@
 from winreg import EnumValue
 import chess_evaluator, chess_machine
 
-def test_evaluator():
+def test_sort():
     game_state = chess_machine.Game_State()
 
-    score = chess_evaluator.evaluate(game_state)
+    valid_moves = game_state.get_valid_moves()
 
-    if score != 0:
-        print("evaluator failed", score)
+    print("Unsorted valid moves: ", valid_moves)
 
-test_evaluator()
+    sorted_valid_moves = chess_evaluator.sort_moves(game_state, valid_moves)
+    print("Sorted valid moves: ", sorted_valid_moves)
+
+test_sort()

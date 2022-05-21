@@ -401,7 +401,7 @@ class Game_State:
 
 
     """
-    Getters for piece movements. Does not handly checks, pins, enpassant, promotion, or castling.
+    Getters for piece movements. Does not handle checks, pins, enpassant, promotion, or castling.
     """
 
     #pawn
@@ -700,6 +700,19 @@ class Move():
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
         
+        #flag variable if move is capture move
+        
+        if self.piece_captured != "--":
+            self.is_capture = True
+        else:
+            self.is_capture = False
+
+        #flag variable if move is a two-square pawn advance
+        if self.piece_moved[1] == 'P' and abs(self.start_row - self.end_row == 2):
+            self.is_two_square_advance = True
+        else:
+            self.is_two_square_advance = False
+
 
         #promotion move
         self.is_pawn_promotion = False      #pawn promotion presumed false

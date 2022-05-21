@@ -103,12 +103,14 @@ queen_scores = [
                 [-39, -30, -31, -13, -31, -36, -34, -42]
                 ]
 
-piece_position_scores = {'N': knight_scores,
-                         'B': bishop_scores,
-                         'Q': queen_scores,
-                         'R': rook_scores,
-                         'P': mg_pawn_scores
-                        }
+position_scores = {
+                    'N': knight_scores,
+                    'B': bishop_scores,
+                    'Q': queen_scores,
+                    'R': rook_scores,
+                    'P': mg_pawn_scores,
+                    'K': mg_king_scores
+                    }
 
 
 """
@@ -150,11 +152,10 @@ def evaluate(game_state):
 Position score getter -- takes in a piece (e.g. "wP") and a square (row, col) and outputs its total score
 """
 def get_score(piece, square):
-
     if piece[0] == 'w':
-        return piece_score[square[1]] + piece_position_scores[piece[1]][square[0]][square[1]]
+        return piece_score[piece[1]] + position_scores[piece[1]][square[0]][square[1]]
     elif piece[0] == 'b':
-        return -(piece_score[square[1]] + piece_position_scores[piece[1]][8 - square[0]][square[1]])
+        return -(piece_score[piece[1]] + position_scores[piece[1]][7 - square[0]][square[1]])
     else:
         return 0
 
@@ -171,25 +172,28 @@ Best move functions.
 #Helper method. Makes first minimax call.
 def find_best_move(game_state, valid_moves):
     game_state_clone = copy.deepcopy(game_state)        #copy the gamestate
-    global best_move, counter
+    global best_move, minimax_counter, quiescence_counter
     best_move = None
 
   #  random.shuffle(valid_moves)
 
-    counter = 0    #for testing. Number of calls for minimax method
+    minimax_counter = 0    #for testing. Number of calls for minimax method
+    quiescence_counter = 0
+
  #   minimax(game_state_clone, valid_moves, MAX_DEPTH, game_state.is_white_turn)
     minimax_alpha_beta(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)    
  #   minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
-    print("minimax call number is " + str(counter)) #for testing
+    print("minimax call number is " + str(minimax_counter)) #for testing
+    print("quiescence call number is " + str(quiescence_counter))
 
     return best_move
 
 
 #return a score at a given depth
 def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
-    global best_move, counter
+    global best_move, minimax_counter
 
-    counter += 1
+    minimax_counter += 1
 
     if depth == 0:
         return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
@@ -200,7 +204,9 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
     for move in valid_moves:
         game_state.make_move(move)
         next_moves = game_state.get_valid_moves()
-
+        
+        next_moves = sort_moves(game_state, next_moves) #sorts to improve processing time
+        
         score = -minimax_alpha_beta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
 
         if score > max_score:
@@ -218,8 +224,8 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
 
 
 def minimax(game_state, valid_moves, depth, is_white_turn):
-    global best_move, counter
-    counter += 1
+    global best_move, minimax_counter
+    minimax_counter += 1
 
     if depth == 0:
         return evaluate(game_state)
@@ -254,8 +260,8 @@ def minimax(game_state, valid_moves, depth, is_white_turn):
 
 
 def minimax_alpha_beta_no_loop(game_state, valid_moves, depth, alpha, beta, is_white_turn):
-    global best_move, counter
-    counter += 1
+    global best_move, minimax_counter
+    minimax_counter += 1
 
     if depth == 0:
         return evaluate(game_state)
@@ -295,6 +301,87 @@ def minimax_alpha_beta_no_loop(game_state, valid_moves, depth, alpha, beta, is_w
             if beta <= alpha:
                 break
         return min_score
+
+
+#quiescence search algorith. Used in conjunction with minimax_alpha_beta
+def quiescence_search(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+    global best_move, quiescence_counter
+    quiescence_counter += 1
+
+    if depth == 0:
+        return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
+    
+    #TO DO - Implement move ordering
+
+    max_score = -CHECKMATE
+    for move in valid_moves:
+        game_state.make_move(move)
+        capture_moves = None
+        for move in game_state.get_valid_moves():
+            if move.is_capture:
+                capture_moves.append(move)
+        
+        score = -quiescence_search(game_state, capture_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
+
+        if score > max_score:
+            max_score = score
+            if depth == MAX_DEPTH:
+                best_move = move
+
+        game_state.undo_move()
+
+        if max_score > alpha:
+            alpha = max_score
+        if alpha >= beta:
+            break
+    return max_score
+
+
+"""
+Sort method. Selects the best few candidate moves and puts them first to increase pruning.
+"""
+
+def sort_moves(game_state, valid_moves):
+    scores = []
+    
+    for i in range(len(valid_moves)):
+        rating = 0
+        move = valid_moves[i]
+        if(move.is_capture and piece_score[move.piece_moved[1]] < piece_score[move.piece_captured[1]]):
+            rating += 100
+        if(move.is_capture and piece_score[move.piece_moved[1]] < piece_score[move.piece_captured[1]]):
+            rating += 50
+        if move.is_pawn_promotion:
+            rating += 200
+        if move.is_two_square_advance:
+            rating += 25
+
+        game_state.make_move(move)
+        if game_state.is_in_check:
+            rating += 50
+        game_state.undo_move()
+
+        scores.append(rating)        
+
+    num_iterations = max(6, len(valid_moves))
+    for i in range(0, num_iterations):   #find top 6 moves
+        max_rating = -10000
+        max_location = 0
+        for j in range(len(scores)):
+            if scores[j] > max_rating:
+                max_rating = scores[j]
+                max_location = j
+        
+        scores[max_location] = -10000   #make already acquired move terrible to look for second best move
+        
+        #swap element at index i with element at index max_location
+        get_pos = valid_moves[i], valid_moves[max_location]
+        
+        valid_moves[max_location], valid_moves[i] = get_pos
+        
+    return valid_moves
+
+
 
 
 #Function that makes a random move
