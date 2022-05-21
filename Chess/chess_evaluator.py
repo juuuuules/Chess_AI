@@ -361,10 +361,10 @@ def sort_moves(game_state, valid_moves):
             rating += 50
         game_state.undo_move()
 
+        print("move: ", move, "rating ", rating)
         scores.append(rating)        
 
-    num_iterations = max(6, len(valid_moves))
-    for i in range(0, num_iterations):   #find top 6 moves
+    for i in range(0, 6):   #find top 6 moves
         max_rating = -10000
         max_location = 0
         for j in range(len(scores)):
