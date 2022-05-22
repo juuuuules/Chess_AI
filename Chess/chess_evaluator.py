@@ -118,7 +118,7 @@ Global variables.
 """
 CHECKMATE = 10000
 STALEMATE = 0
-MAX_DEPTH = 4
+MAX_DEPTH = 6
 
 
 
@@ -184,7 +184,7 @@ def find_best_move(game_state, valid_moves):
     minimax_alpha_beta(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)    
  #   minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
     print("minimax call number is " + str(minimax_counter)) #for testing
-    print("quiescence call number is " + str(quiescence_counter))
+ #   print("quiescence call number is " + str(quiescence_counter))
 
     return best_move
 
@@ -199,13 +199,12 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
         return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
     
     #TO DO - Implement move ordering
+    valid_moves = sort_moves(game_state, valid_moves)
 
     max_score = -CHECKMATE
     for move in valid_moves:
         game_state.make_move(move)
         next_moves = game_state.get_valid_moves()
-        
-        next_moves = sort_moves(game_state, next_moves) #sorts to improve processing time
         
         score = -minimax_alpha_beta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)         #swap alpha and beta
 
@@ -372,7 +371,7 @@ def sort_moves(game_state, valid_moves):
                 max_rating = scores[j]
                 max_location = j
         
-        if len(valid_moves) > 1: #prevents an index out out of range by not swapping if valid moves is only 1 element
+        if len(valid_moves) > 6: #prevents an index out out of range by not swapping if valid moves is only 1 element
             scores[max_location] = -10000   #make already acquired move terrible to look for second best move
             
             #swap element at index i with element at index max_location
