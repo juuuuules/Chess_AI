@@ -372,12 +372,13 @@ def sort_moves(game_state, valid_moves):
                 max_rating = scores[j]
                 max_location = j
         
-        scores[max_location] = -10000   #make already acquired move terrible to look for second best move
-        
-        #swap element at index i with element at index max_location
-        get_pos = valid_moves[i], valid_moves[max_location]
-        
-        valid_moves[max_location], valid_moves[i] = get_pos
+        if len(valid_moves) > 1: #prevents an index out out of range by not swapping if valid moves is only 1 element
+            scores[max_location] = -10000   #make already acquired move terrible to look for second best move
+            
+            #swap element at index i with element at index max_location
+            get_pos = valid_moves[i], valid_moves[max_location]
+            
+            valid_moves[max_location], valid_moves[i] = get_pos
         
     return valid_moves
 
