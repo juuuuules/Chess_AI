@@ -128,16 +128,23 @@ def main():
         #this just adds the text above the boxes saying what they do
         screen.fill((255, 0, 0))
         font = p.font.SysFont("Helvetica", 20)
+        font2 = p.font.SysFont("Helvetica", 70)
 
+        deep_blue_text = font2.render("DEEP BLUE", True, (0, 0, 0))
         sandbox_text = font.render("sandbox", True, (0, 0, 0))
         against_computer_text = font.render("play against computer", True, (0, 0, 0))
 
+        deep_blue_text_rect = deep_blue_text.get_rect()
         sandbox_text_rect = sandbox_text.get_rect()
         against_computer_text_rect = sandbox_text.get_rect()
 
+        deep_blue_text_rect.center = (340, 70)
         sandbox_text_rect.center = (150, 170)
         against_computer_text_rect.center = (480, 170)
 
+        p.draw.rect(screen, (0, 255, 255), deep_blue_text_rect)
+
+        screen.blit(deep_blue_text, deep_blue_text_rect)
         screen.blit(sandbox_text, sandbox_text_rect)
         screen.blit(against_computer_text, against_computer_text_rect)
 
