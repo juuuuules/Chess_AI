@@ -757,3 +757,20 @@ class Move():
     #Helper function. Gets  rank and file given row and column.
     def get_rank_file(self, row, col):
         return self.cols_to_files[col] + self.rows_to_ranks[row]    #returns the file corresponding to the column "col" + the rank corresponding to the row "row". File then rank, because thats how chess notation works
+
+
+    def __str__(self):
+        if self.is_castle_move:
+            return "O-O" if self.end_col == 6 else "O-O-O"
+        
+        end_square = self.get_rank_file(self.end_row, self.end_col)
+
+        if self.piece_moved[1] == "P":
+            if self.is_capture:
+                return self.cols_to_files[self.start_col] + "x" + end_square
+            else:
+                return end_square + "=Q" if self.is_pawn_promotion else end_square
+        move_string = self.piece_moved[1]
+        if self.is_capture:
+            move_string += "x"
+        return move_string + end_square

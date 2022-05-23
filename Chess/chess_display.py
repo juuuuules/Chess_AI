@@ -22,6 +22,10 @@ SQ_SIZE = HEIGHT // DIMENSION #sets the size of each square
 IMAGES = {} #Creates a global images directory
 
 
+MOVE_LOG_PANEL_WIDTH = 250
+MOVE_LOG_PANEL_HEIGHT = HEIGHT
+
+
 """
 EVAN'S SHIT
 """
@@ -99,10 +103,13 @@ def load_images():
     
 #Main method - handles user input, updates graphics
 def main():
-    screen = p.display.set_mode((WIDTH, HEIGHT))    #sets a drawing window according to the HEIGHT and WIDTH specifications set above
+    screen = p.display.set_mode((WIDTH + MOVE_LOG_PANEL_WIDTH, HEIGHT))    #sets a drawing window according to the HEIGHT and WIDTH specifications set above
     clock = p.time.Clock()  #creates a clock object (built into pygame)
     screen.fill((255, 255, 255))    #sets the screen to be white lol
-    
+    move_log_font = p.font.SysFont("Arial", 18, False, False) #creates a font object; helvetica, size 12, not bold, not italicized
+
+
+
     animate = False #flag variable for when we want to animate a move
 
     game_state = chess_machine.Game_State() #creates a game_state object named game_state that calls the constructor and creates appropriate field variables (defined in the chess_machine class)
@@ -241,7 +248,7 @@ def main():
 
 
                         #check if square is ALREADY SELECTED
-                        if square_selected == (row, col):        #the user clicked the same square twice
+                        if square_selected == (row, col) or col >= 8:        #the user clicked the same square twice or user clicked move log
                             square_selected = ()        #deselect
                             player_clicks = []  #clear player_clicks
                         else:
@@ -324,21 +331,21 @@ def main():
             move_made = False
             animate = False
 
-        draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves) #calls draw_game_state to draw the current state
+        draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves, move_log_font) #calls draw_game_state to draw the current state
 
         #End game handlers
         #Checkmate:
         if game_state.is_checkmate:
             game_over = True
             if game_state.is_white_turn:
-                draw_text(screen, 'Black wins by checkmate')
+                draw_endgame_text(screen, 'Black wins by checkmate')
                 time.sleep(2)
             else:
-                draw_text(screen, 'White wins by checkmate')
+                draw_endgame_text(screen, 'White wins by checkmate')
                 time.sleep(2)
         elif game_state.is_draw:
             game_over = True
-            draw_text(screen, 'The game ends in a draw')
+            draw_endgame_text(screen, 'The game ends in a draw')
             time.sleep(2)
 
 
@@ -349,11 +356,11 @@ def main():
 
 
 #Method responsible for all the graphics within a current game state
-def draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves):
+def draw_game_state(screen, game_state, valid_moves, square_selected, possible_moves, move_log_font):
     draw_board(screen) #draw squares on the board
     highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves)
     draw_pieces(screen, game_state.board) #draw pieces on top of squares
-
+    draw_move_log(screen, game_state, move_log_font)
   
 #Draw squares on the board. Uses white and grey colors. Call draw board first. Top left square is always white square
 def draw_board(screen):
@@ -409,6 +416,35 @@ def draw_pieces(screen, board):
             if piece != "--": #if not an empty square
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE)) #outputs the image of the identified piece at location c*SQ_SIZE r*SQ_SIZE with dimensions SQ_SIZE * SQ_SIZE
 
+#Function that draws the move log
+def draw_move_log(screen, game_state, font):
+    #draw side rectangle
+    move_log_rect = p.Rect(WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    p.draw.rect(screen, p.Color("black"), move_log_rect)
+    move_log = game_state.move_log
+    move_texts = []
+    for i in range(0, len(move_log), 2):
+        move_string = str(i//2 + 1) + ". " + str(move_log[i]) + " "
+        if i + 1 < len(move_log): #make sure black made a move
+            move_string += str(move_log[i+1]) + "  "
+        move_texts.append(move_string)
+
+    moves_per_row = 3
+    padding = 5
+    line_spacing = 2
+    text_y = padding
+    for i in range(0, len(move_texts), moves_per_row):
+        text = ""
+        for j in range(moves_per_row):
+            if i + j < len(move_texts):
+                text += move_texts[i+j]
+
+        text_object = font.render(text, True, p.Color('white'))
+        text_location = move_log_rect.move(padding, text_y)
+        screen.blit(text_object, text_location)
+        text_y += text_object.get_height() + line_spacing
+
+
 #Function that animates the moves
 def animate_move(move, screen, board, clock):
     global colors
@@ -440,7 +476,7 @@ def animate_move(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)  #framerate
 
-def draw_text(screen, text):
+def draw_endgame_text(screen, text):
     if os.path.isdir("Chess"):
         font = p.font.SysFont("Helvetica", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
     else:
@@ -456,6 +492,12 @@ def draw_text(screen, text):
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
 
     screen.blit(text_object, text_location) #blits the text_object at the proper location.
+
+def draw_text():
+    pass
+
+
+
 
 main() #calls the main method
 
