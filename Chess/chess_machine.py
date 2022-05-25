@@ -103,7 +103,7 @@ class Game_State:
     """
     Make move method. Takes a move as a parameter and executes it.
     """
-    def make_move(self, move):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
+    def make_move(self, move, is_real_move = False):  #function that takes in a move object and updates the game_state according to the move made. Assumes move is valid.
 
         self.board[move.start_row][move.start_col] = "--" #makes the starting location an empty square 
         self.board[move.end_row][move.end_col] = move.piece_moved #sets the new square to be the piece that we moved from the old square.
@@ -155,13 +155,14 @@ class Game_State:
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
 
         #Update draw log
-        copy_board = copy.deepcopy(self)
-        self.game_state_log.append(copy_board.board)
+        if is_real_move:
+            copy_board = copy.deepcopy(self)
+            self.game_state_log.append(copy_board.board)
 
     """
     Undo function that reverses previous move.
     """
-    def undo_move(self):
+    def undo_move(self, is_real_undo = False):
         if len(self.move_log) != 0:     #if there is a move to undo
             move = self.move_log.pop()  #removes last element in the move_log list
             
@@ -203,7 +204,8 @@ class Game_State:
             self.is_draw = False
         
             #Update draw log
-            self.game_state_log.pop()
+            if is_real_undo:
+                self.game_state_log.pop()
     """
     Function that gets a list of all the legal moves in a particular position.
     """
