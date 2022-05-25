@@ -92,7 +92,7 @@ class Game_State:
             for i in range(len(self.game_state_log)):
                 if board == self.game_state_log[i]:
                     counter += 1
-            if counter == 3:
+            if counter == 4:
                 return True
         
         return False
@@ -155,12 +155,6 @@ class Game_State:
         #Update draw log
         copy_board = copy.deepcopy(self)
         self.game_state_log.append(copy_board.board)
-        print("spot on a2 is changing to " + self.game_state_log[-1][6][0])
-        print("adding to the game state log")
-        print("spot on a2 is " + self.board[6][0])
-        print("spot on a2 from previous board is " + self.game_state_log[-2][6][0])
-        print("length of game_state_log is " + str(len(self.game_state_log)))
-        print("\n")
 
     """
     Undo function that reverses previous move.
