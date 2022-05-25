@@ -204,7 +204,6 @@ class Game_State:
         
             #Update draw log
             self.game_state_log.pop()
-            print("Game state log is ", self.game_state_log)
     """
     Function that gets a list of all the legal moves in a particular position.
     """
