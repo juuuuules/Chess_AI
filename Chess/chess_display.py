@@ -246,6 +246,7 @@ def main():
                         if (location[0] > WIDTH + 50 and location[0] < WIDTH + 151) and (
                             location[1] > HEIGHT - 100 and location[1] < HEIGHT - 70):
                             resigned = True
+                            print("just resigned")
 
                         col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
                         row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
@@ -345,23 +346,18 @@ def main():
             game_over = True
             if game_state.is_white_turn:
                 draw_endgame_text(screen, 'Black wins by checkmate')
-                time.sleep(2)
+
             else:
                 draw_endgame_text(screen, 'White wins by checkmate')
-                time.sleep(2)
+
         elif game_state.is_draw:
             game_over = True
             draw_endgame_text(screen, 'The game ends in a draw')
-            time.sleep(2)
         elif resigned:
             if player_one:
                 draw_endgame_text(screen, "black wins by resignation")
-                print("black win resignation")
-                time.sleep(2)
             else:
                 draw_endgame_text(screen, "white wins by resignation")
-                print("white win resignation")
-                time.sleep(2)
             game_over = True
 
 
@@ -507,7 +503,7 @@ def draw_endgame_text(screen, text):
     if os.path.isdir("Chess"):
         font = p.font.SysFont("Helvetica", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
     else:
-        font = p.font.SysFont("Helvetica", 80, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+        font = p.font.SysFont("Helvetica", 60, True, False) #creates a font object; helvetica, size 80, bold, not italicized
 
     text_object = font.render(text, True, 0, (255, 0, 255))
     
@@ -515,7 +511,7 @@ def draw_endgame_text(screen, text):
         WIDTH = HEIGHT = 500
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 3, HEIGHT // 2)
     else:
-        WIDTH = HEIGHT = 700
+        WIDTH = HEIGHT = 600
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
 
     screen.blit(text_object, text_location) #blits the text_object at the proper location.
