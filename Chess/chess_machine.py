@@ -3,6 +3,7 @@
 
 from string import whitespace
 from xmlrpc.client import FastMarshaller
+import copy
 
 
 class Game_State:
@@ -152,8 +153,14 @@ class Game_State:
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
 
         #Update draw log
-        self.game_state_log.append(self.board)
-        print("Game state log is ", self.game_state_log)
+        copy_board = copy.deepcopy(self)
+        self.game_state_log.append(copy_board.board)
+        print("spot on a2 is changing to " + self.game_state_log[-1][6][0])
+        print("adding to the game state log")
+        print("spot on a2 is " + self.board[6][0])
+        print("spot on a2 from previous board is " + self.game_state_log[-2][6][0])
+        print("length of game_state_log is " + str(len(self.game_state_log)))
+        print("\n")
 
     """
     Undo function that reverses previous move.
