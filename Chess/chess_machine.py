@@ -41,6 +41,7 @@ class Game_State:
         self.enpassant_possible = ()       #coordinates for the square where en passant capture is possible
         self.enpassant_possible_log = [self.enpassant_possible]
 
+        self.game_state_log = [self.board]
 
         #King location variables
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
@@ -73,7 +74,28 @@ class Game_State:
                                                         self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle)]  #creates a list of castling_rights objects, taking a snapshot of the current castling rights state by creating a new Castle_Rights object 
 
  
-
+    #returns true if a game state has repeated three times, false otherwise.
+    def three_move_repetition(self):
+    
+        """
+        
+        game_state_log = []
+        for i in range(len(self.move_log)):
+            temp_game_state = Game_State()
+            for j in range(0, i):
+                temp_game_state.make_move(self.move_log[j])
+            game_state_log.append(temp_game_state)
+        """
+        for board in self.game_state_log:
+            counter = 0
+            for i in range(len(self.game_state_log)):
+                if board == self.game_state_log[i]:
+                    counter += 1
+            if counter == 3:
+                return True
+        
+        return False
+    
 
     """
     Make move method. Takes a move as a parameter and executes it.
@@ -129,6 +151,10 @@ class Game_State:
         self.castle_rights_log.append(Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                     self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle))  #adds current castle_rights state to the castling rights log.
 
+        #Update draw log
+        self.game_state_log.append(self.board)
+        print("Game state log is ", self.game_state_log)
+
     """
     Undo function that reverses previous move.
     """
@@ -173,7 +199,9 @@ class Game_State:
             self.is_checkmate = False
             self.is_draw = False
         
-
+            #Update draw log
+            self.game_state_log.pop()
+            print("Game state log is ", self.game_state_log)
     """
     Function that gets a list of all the legal moves in a particular position.
     """
@@ -245,7 +273,10 @@ class Game_State:
             if self.in_check(): #if in check
                 self.is_checkmate = True    #then it's checkmate
             else:   #if its not check  
-                self.is_stalemate = True    #then it's stalemate
+                self.is_draw = True    #then it's stalemate
+        elif self.three_move_repetition():
+            self.is_draw = True
+
 
         self.current_castle_rights = temp_castle_rights #sets back the current castling rights to the saved state at the beginning of the method
 
@@ -656,7 +687,17 @@ class Game_State:
         return False
 
 
+    def __eq__(self, other):    #comparing the self object to another move object, saved in the parameter other
+        if isinstance(other, Game_State): #if "other" object is an instance of the Game_State class
+            for row in range(len(self.board)):
+                for col in range(len(self.board[row])):       #iterate over the board
+                    if self.board[row][col] != other.board[row][col]:
+                        return False
 
+            return True
+        return False
+    def __ne__(self, other):
+        return not self == other
 
 #Castling Rights class. Creates objects with 4 boolean parameters indicating whether/how white and black can castle.
 #Several rules must be taking into account:

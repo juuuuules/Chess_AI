@@ -301,7 +301,7 @@ def main():
                     print(game_state.current_castle_rights.white_kingside_castle)
 
 
-                if event.key == p.K_r and p.key.get_mods() & p.KMOD_CTRL:   #reset board when 'ctrl + z' is pressed
+                if event.key == p.K_r and p.key.get_mods() & p.KMOD_CTRL:   #reset board when 'ctrl + r' is pressed
                     game_state = chess_machine.Game_State()
                     valid_moves = game_state.get_valid_moves()
                     square_selected = ()
