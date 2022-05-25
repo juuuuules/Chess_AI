@@ -42,7 +42,9 @@ class Game_State:
         self.enpassant_possible = ()       #coordinates for the square where en passant capture is possible
         self.enpassant_possible_log = [self.enpassant_possible]
 
-        self.game_state_log = [self.board]
+        board_copy_1 = copy.deepcopy(self)
+
+        self.game_state_log = [board_copy_1.board]
 
         #King location variables
         self.white_king_location = (7, 4)   #white king starts at row 7 col 4    
