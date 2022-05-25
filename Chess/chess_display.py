@@ -227,9 +227,9 @@ def main():
 
     #Run until user asks to quit
     running = True
+    resigned = False
     while running:
-
-
+        
         is_human_turn = (game_state.is_white_turn and player_one) or (not game_state.is_white_turn and player_two)
 
         for event in p.event.get(): #iterates through all the "events" -- includes clicks, button presses, etc
@@ -238,9 +238,16 @@ def main():
 
         #mouse handler
             elif event.type == p.MOUSEBUTTONDOWN: #asks whether user clicks somewhere on the screen
+
                 if not game_over:
                     if is_human_turn:
                         location = p.mouse.get_pos() #gets the (x, y) location of mouse
+
+                        if (location[0] > WIDTH + 50 and location[0] < WIDTH + 151) and (
+                            location[1] > HEIGHT - 50 and location[1] < HEIGHT - 20):
+                            resigned = True
+                            print("just resigned")
+
                         col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
                         row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
 
@@ -339,14 +346,19 @@ def main():
             game_over = True
             if game_state.is_white_turn:
                 draw_endgame_text(screen, 'Black wins by checkmate')
-                time.sleep(2)
+
             else:
                 draw_endgame_text(screen, 'White wins by checkmate')
-                time.sleep(2)
+
         elif game_state.is_draw:
             game_over = True
             draw_endgame_text(screen, 'The game ends in a draw')
-            time.sleep(2)
+        elif resigned:
+            if player_one:
+                draw_endgame_text(screen, "black wins by resignation")
+            else:
+                draw_endgame_text(screen, "white wins by resignation")
+            game_over = True
 
 
 
@@ -361,7 +373,18 @@ def draw_game_state(screen, game_state, valid_moves, square_selected, possible_m
     highlight_squares(screen, game_state, valid_moves, square_selected, possible_moves)
     draw_pieces(screen, game_state.board) #draw pieces on top of squares
     draw_move_log(screen, game_state, move_log_font)
-  
+    draw_resign_button(screen)
+
+def draw_resign_button(screen):
+    font = p.font.SysFont("Helvetica", 30, True, False)
+    resign_text_object = font.render("resign", True, (255, 0, 0), (0, 0, 255))
+    resign_text_location = p.Rect(0, 0, resign_text_object.get_width(), resign_text_object.get_height()).move(WIDTH + 50, HEIGHT - 50)
+    screen.blit(resign_text_object, resign_text_location) #blits the text_object at the proper location.
+
+    # print("width = " + str(resign_text_object.get_width()))
+    # print("height = " + str(resign_text_object.get_height()))
+
+
 #Draw squares on the board. Uses white and grey colors. Call draw board first. Top left square is always white square
 def draw_board(screen):
     global colors
@@ -480,7 +503,7 @@ def draw_endgame_text(screen, text):
     if os.path.isdir("Chess"):
         font = p.font.SysFont("Helvetica", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
     else:
-        font = p.font.SysFont("Helvetica", 80, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+        font = p.font.SysFont("Helvetica", 60, True, False) #creates a font object; helvetica, size 80, bold, not italicized
 
     text_object = font.render(text, True, 0, (255, 0, 255))
     
@@ -488,7 +511,7 @@ def draw_endgame_text(screen, text):
         WIDTH = HEIGHT = 500
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 3, HEIGHT // 2)
     else:
-        WIDTH = HEIGHT = 700
+        WIDTH = HEIGHT = 600
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
 
     screen.blit(text_object, text_location) #blits the text_object at the proper location.
