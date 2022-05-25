@@ -244,7 +244,7 @@ def main():
                         location = p.mouse.get_pos() #gets the (x, y) location of mouse
 
                         if (location[0] > WIDTH + 50 and location[0] < WIDTH + 151) and (
-                            location[1] > HEIGHT - 100 and location[1] < HEIGHT - 70):
+                            location[1] > HEIGHT - 50 and location[1] < HEIGHT - 20):
                             resigned = True
                             print("just resigned")
 
@@ -378,7 +378,7 @@ def draw_game_state(screen, game_state, valid_moves, square_selected, possible_m
 def draw_resign_button(screen):
     font = p.font.SysFont("Helvetica", 30, True, False)
     resign_text_object = font.render("resign", True, (255, 0, 0), (0, 0, 255))
-    resign_text_location = p.Rect(0, 0, resign_text_object.get_width(), resign_text_object.get_height()).move(WIDTH + 50, HEIGHT - 100)
+    resign_text_location = p.Rect(0, 0, resign_text_object.get_width(), resign_text_object.get_height()).move(WIDTH + 50, HEIGHT - 50)
     screen.blit(resign_text_object, resign_text_location) #blits the text_object at the proper location.
 
     # print("width = " + str(resign_text_object.get_width()))
