@@ -103,13 +103,19 @@ queen_scores = [
                 [-39, -30, -31, -13, -31, -36, -34, -42]
                 ]
 
-position_scores = {
-                    'N': knight_scores,
-                    'B': bishop_scores,
-                    'Q': queen_scores,
-                    'R': rook_scores,
-                    'P': mg_pawn_scores,
-                    'K': mg_king_scores
+position_scores =   {
+                    'mgN': knight_scores,
+                    'egN': knight_scores,
+                    'mgB': bishop_scores,
+                    'egB': bishop_scores,
+                    'mgQ': queen_scores,
+                    'egQ': queen_scores,
+                    'mgR': rook_scores,
+                    'egR': rook_scores,
+                    'mgP': mg_pawn_scores,
+                    'egP': eg_pawn_scores,
+                    'mgK': mg_king_scores,
+                    'egK': eg_king_scores
                     }
 
 
@@ -120,14 +126,20 @@ CHECKMATE = 10000
 STALEMATE = 0
 MAX_DEPTH = 4
 
+global game_phase
+game_phase = "mg"
 
-
+"""
+Opening strings
+"""
+opening_bongcloud = ["e4", "e5", "Ke2", "Ke7"]
 
 """
 Evaluation Function.
 """
 #evaluation function that scores the board. This version is based only on material
 def evaluate(game_state):
+    global game_phase
     #Checkmate handler
     if game_state.is_checkmate:
         if game_state.is_white_turn:
@@ -139,23 +151,34 @@ def evaluate(game_state):
         return STALEMATE
 
     score = 0
+    total_material = 0
 
     for row in range(len(game_state.board)):
         for col in range(len(game_state.board[row])):       #iterate over the board
             piece = game_state.board[row][col]
+            
+            #calculate whether its middle or end game
+            if piece[1] != 'K' and piece != '--':
+                total_material += piece_score[piece[1]]
+                        
             square = (row, col)
-            score += get_score(piece, square)
+            score += get_score(piece, square, game_phase)
+
+    if total_material < 4000:
+        game_phase = "eg"
 
     return score    #turns the score into a decimal
         
 """
 Position score getter -- takes in a piece (e.g. "wP") and a square (row, col) and outputs its total score
 """
-def get_score(piece, square):
+def get_score(piece, square, game_phase):
+
+    key = game_phase + piece[1]
     if piece[0] == 'w':
-        return piece_score[piece[1]] + position_scores[piece[1]][square[0]][square[1]]
+        return piece_score[piece[1]] + position_scores[key][square[0]][square[1]]
     elif piece[0] == 'b':
-        return -(piece_score[piece[1]] + position_scores[piece[1]][7 - square[0]][square[1]])
+        return -(piece_score[piece[1]] + position_scores[key][7 - square[0]][square[1]])
     else:
         return 0
 
@@ -178,7 +201,12 @@ def find_best_move(game_state, valid_moves):
   #  random.shuffle(valid_moves)
 
     minimax_counter = 0    #for testing. Number of calls for minimax method
-    quiescence_counter = 0
+ 
+    #Opening database
+    game_state_clone
+ 
+ 
+ #   quiescence_counter = 0
 
  #   minimax(game_state_clone, valid_moves, MAX_DEPTH, game_state.is_white_turn)
     minimax_alpha_beta(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)    
