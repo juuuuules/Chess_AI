@@ -283,6 +283,8 @@ def main():
                                     print("Move: ", str(move))
                                     print("Half-move counter: ", game_state.half_move_counter)
                                     print("Evaluation: ", chess_evaluator.evaluate(game_state))
+                                    print("Game Phase: ", chess_evaluator.game_phase)
+
                                     print("------------------")
                                     """
                                     END PRINT STATEMENTS
@@ -335,7 +337,8 @@ def main():
             print("execute time: ", time.process_time() - start_time)
 
             print("Half-move counter: ", game_state.half_move_counter)
-            print("Evaluation: ", chess_evaluator.evaluate(game_state))
+            print("Game Phase: ", chess_evaluator.game_phase)
+            print("Evaluation: ", chess_evaluator.evaluate(game_state))            
             print("------------------")
             """
             END PRINT STATEMENTS
