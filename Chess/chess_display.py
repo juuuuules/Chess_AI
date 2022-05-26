@@ -133,30 +133,30 @@ def main():
     while in_menu: #create the menu
 
         #this just adds the text above the boxes saying what they do
-        screen.fill((255, 0, 0))
-        font = p.font.SysFont("Helvetica", 20)
-        font2 = p.font.SysFont("Helvetica", 70)
+        screen.fill((102, 153, 204))
+        font = p.font.SysFont("Cambria", 75)
+        font2 = p.font.SysFont("Comic Sans", 150)
 
-        shallow_blue_text = font2.render("SHALLOW BLUE", True, (0, 0, 0))
-        sandbox_text = font.render("sandbox", True, (0, 0, 0))
-        against_computer_text = font.render("play against computer", True, (0, 0, 0))
+        shallow_blue_text = font2.render("SHALLOW BLUE", True, (3, 37, 126))
+        sandbox_text = font.render("Sandbox", True, (3, 37, 126))
+        against_computer_text = font.render("Play Computer", True, (3, 37, 126))
 
         shallow_blue_text_rect = shallow_blue_text.get_rect()
         sandbox_text_rect = sandbox_text.get_rect()
         against_computer_text_rect = sandbox_text.get_rect()
 
-        shallow_blue_text_rect.center = (340, 70)
-        sandbox_text_rect.center = (150, 170)
-        against_computer_text_rect.center = (480, 170)
+        shallow_blue_text_rect.center = (625, 300)
+        sandbox_text_rect.center = (350, 650)
+        against_computer_text_rect.center = (825, 650)
 
-        p.draw.rect(screen, (0, 255, 255), shallow_blue_text_rect)
+    #    p.draw.rect(screen, (0, 255, 255), shallow_blue_text_rect)
 
         screen.blit(shallow_blue_text, shallow_blue_text_rect)
         screen.blit(sandbox_text, sandbox_text_rect)
         screen.blit(against_computer_text, against_computer_text_rect)
 
-        p.draw.rect(screen, (0, 255, 0), p.Rect(100, 200, 100, 100))
-        p.draw.rect(screen, (0, 0, 255), p.Rect(500, 200, 100, 100))
+        p.draw.rect(screen, (135, 206, 250), p.Rect(300, 500, 100, 100))
+        p.draw.rect(screen, (0, 0, 139), p.Rect(850, 500, 100, 100))
         p.display.flip()
 
         for event in p.event.get():
@@ -167,13 +167,13 @@ def main():
                 x_pos = p.mouse.get_pos()[0]
                 y_pos = p.mouse.get_pos()[1]
 
-                if (x_pos < 200 and x_pos > 100) and (y_pos < 300 and y_pos > 200): #check if green box is clicked
+                if (x_pos < 400 and x_pos > 300) and (y_pos < 600 and y_pos > 500): #check if left box is clicked
                     player_one = True
                     player_two = True
                     in_menu = False
                     #set it to sandbox mode
 
-                if (x_pos < 600 and x_pos > 500) and (y_pos < 300 and y_pos > 200): #check if blue box is clicked
+                if (x_pos < 950 and x_pos > 850) and (y_pos < 600 and y_pos > 500): #check if right box is clicked
                     in_menu = False
                     in_choose_color_menu = True
                     #bring it to the select color phase
@@ -181,20 +181,20 @@ def main():
     while in_choose_color_menu: #create the choose color menu
         #makes the text above the boxes
 
-        screen.fill((255, 0, 0))
-        font = p.font.SysFont("Helvetica", 20)
+        screen.fill((102, 153, 204))
+        font = p.font.SysFont("Cambria", 75)
 
-        p.draw.rect(screen, (255, 255, 255), p.Rect(100, 200, 100, 100))
-        p.draw.rect(screen, (0, 0, 0), p.Rect(500, 200, 100, 100))
+        p.draw.rect(screen, (255, 255, 255), p.Rect(250, 400, 200, 200))
+        p.draw.rect(screen, (0, 0, 0), p.Rect(800, 400, 200, 200))
 
-        white_text = font.render("play as white", True, (0, 0, 0))
-        black_text = font.render("play as black", True, (0, 0, 0))
+        white_text = font.render("Play White", True, (255, 255, 255))
+        black_text = font.render("Play Black", True, (0, 0, 0))
 
         white_text_rect = white_text.get_rect()
         black_text_rect = black_text.get_rect()
 
-        white_text_rect.center = (150, 170)
-        black_text_rect.center = (550, 170)
+        white_text_rect.center = (350, 650)
+        black_text_rect.center = (900, 650)
 
         screen.blit(white_text, white_text_rect)
         screen.blit(black_text, black_text_rect)
@@ -209,13 +209,13 @@ def main():
                 x_pos = p.mouse.get_pos()[0]
                 y_pos = p.mouse.get_pos()[1]
 
-                if (x_pos < 200 and x_pos > 100) and (y_pos < 300 and y_pos > 200): #check if left box is clicked
+                if (x_pos < 450 and x_pos > 250) and (y_pos < 600 and y_pos > 400): #check if left box is clicked
                     player_one = True
                     player_two = False
                     in_choose_color_menu = False
                     #have player play as white
 
-                if (x_pos < 600 and x_pos > 500) and (y_pos < 300 and y_pos > 200): #check if right box is clicked
+                if (x_pos < 1000 and x_pos > 800) and (y_pos < 600 and y_pos > 400): #check if right box is clicked
                     player_one = False
                     player_two = True
                     in_choose_color_menu = False
@@ -223,6 +223,7 @@ def main():
         p.display.flip()
     
     
+    chess_evaluator.load_openings(game_state)
     
 
     #Run until user asks to quit
@@ -243,10 +244,9 @@ def main():
                     if is_human_turn:
                         location = p.mouse.get_pos() #gets the (x, y) location of mouse
 
-                        if (location[0] > WIDTH + 50 and location[0] < WIDTH + 151) and (
-                            location[1] > HEIGHT - 50 and location[1] < HEIGHT - 20):
+                        if (location[0] > WIDTH + 50 and location[0] < WIDTH + 200) and (
+                            location[1] > HEIGHT - 100 and location[1] < HEIGHT - 25):
                             resigned = True
-                            print("just resigned")
 
                         col = location[0]//SQ_SIZE #gets the x coordinate, then divides it by the square size to determine the column 
                         row = location[1]//SQ_SIZE #gets the y coordinate, then divides it by the square size to determine the row
@@ -277,15 +277,18 @@ def main():
                             for i in range(len(valid_moves)):
                                 if move == valid_moves[i]:
                                     game_state.make_move(valid_moves[i], is_real_move=True)        #move generated by the engine, not the move generated by the player
-                                    
                                     """
-                                    FOR TESTING PURPOSES
+                                    PRINT STATEMENTS
                                     """
-                                    print("Half move counter: ", game_state.half_move_counter)
-                                    
+                                    print("Move: ", str(move))
+                                    print("Half-move counter: ", game_state.half_move_counter)
+                                    print("Evaluation: ", chess_evaluator.evaluate(game_state))
+                                    print("------------------")
+                                    """
+                                    END PRINT STATEMENTS
+                                    """
                                     move_made = True
                                     animate = True
-                                    print(move.get_chess_notation())
                                     square_selected = ()    #reset user clicks
                                     player_clicks = []      #resets user clicks
                             if not move_made:
@@ -323,10 +326,21 @@ def main():
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
-            
-            print("Half move counter: ", game_state.half_move_counter)
+
+
+            """
+            PRINT STATEMENTS
+            """
+            print("Move: ", str(move))
             print("execute time: ", time.process_time() - start_time)
-            
+
+            print("Half-move counter: ", game_state.half_move_counter)
+            print("Evaluation: ", chess_evaluator.evaluate(game_state))
+            print("------------------")
+            """
+            END PRINT STATEMENTS
+            """
+
             move_made = True
             animate = True
 #            reset_castle_rights(game_state)
@@ -347,19 +361,19 @@ def main():
         if game_state.is_checkmate:
             game_over = True
             if game_state.is_white_turn:
-                draw_endgame_text(screen, 'Black wins by checkmate')
+                draw_endgame_text(screen, 'Black Wins by Checkmate')
 
             else:
-                draw_endgame_text(screen, 'White wins by checkmate')
+                draw_endgame_text(screen, 'White Wins by Checkmate')
 
         elif game_state.is_draw:
             game_over = True
-            draw_endgame_text(screen, 'The game ends in a draw')
+            draw_endgame_text(screen, 'The Game Ends in a Draw')
         elif resigned:
             if player_one:
-                draw_endgame_text(screen, "black wins by resignation")
+                draw_endgame_text(screen, "Black Wins by Resignation")
             else:
-                draw_endgame_text(screen, "white wins by resignation")
+                draw_endgame_text(screen, "white Wins by Resignation")
             game_over = True
 
 
@@ -378,9 +392,9 @@ def draw_game_state(screen, game_state, valid_moves, square_selected, possible_m
     draw_resign_button(screen)
 
 def draw_resign_button(screen):
-    font = p.font.SysFont("Helvetica", 30, True, False)
-    resign_text_object = font.render("resign", True, (255, 0, 0), (0, 0, 255))
-    resign_text_location = p.Rect(0, 0, resign_text_object.get_width(), resign_text_object.get_height()).move(WIDTH + 50, HEIGHT - 50)
+    font = p.font.SysFont("Comic sans", 50, True, False)
+    resign_text_object = font.render("Resign", True, (3, 37, 126))
+    resign_text_location = p.Rect(0, 0, resign_text_object.get_width(), resign_text_object.get_height()).move(WIDTH + 50, HEIGHT - 100)
     screen.blit(resign_text_object, resign_text_location) #blits the text_object at the proper location.
 
     # print("width = " + str(resign_text_object.get_width()))
@@ -390,7 +404,7 @@ def draw_resign_button(screen):
 #Draw squares on the board. Uses white and grey colors. Call draw board first. Top left square is always white square
 def draw_board(screen):
     global colors
-    colors = [p.Color("white"), p.Color("brown")]   #chooses white and brown to be colors. Perhaps later we could let users pick the color?
+    colors = [p.Color(255, 255, 255), p.Color(102, 153, 204)]   #chooses white and brown to be colors. Perhaps later we could let users pick the color?
     for r in range(DIMENSION):      #double for loop to iterate over the board and go square by square
         for c in range(DIMENSION):
             color = colors[ ((r+c)%2) ]    #selects 'color' to be either index 0 (white) or index 1 (brown). Relies on the following fact: if a chessboard is represented by an 8x8 matrix, with the top left entry (00) and bottom right entry (77), then the sum of the coordinates of the white squares will always be even, and the sum of the coordinates of the dark squares will always be odd.
@@ -503,19 +517,21 @@ def animate_move(move, screen, board, clock):
 
 def draw_endgame_text(screen, text):
     if os.path.isdir("Chess"):
-        font = p.font.SysFont("Helvetica", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+        font = p.font.SysFont("Comic Sans", 40, True, False) #creates a font object; helvetica, size 80, bold, not italicized
     else:
-        font = p.font.SysFont("Helvetica", 60, True, False) #creates a font object; helvetica, size 80, bold, not italicized
+        font = p.font.SysFont("Comic Sans", 60, True, False) #creates a font object; helvetica, size 80, bold, not italicized
 
-    text_object = font.render(text, True, 0, (255, 0, 255))
-    
+    text_object = font.render(text, True, (3, 37, 126))
+    text_object_shadow = font.render(text, True, 0) 
+
     if os.path.isdir("Chess"):
         WIDTH = HEIGHT = 500
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 3, HEIGHT // 2)
     else:
-        WIDTH = HEIGHT = 600
+        WIDTH = HEIGHT = 1000
         text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH // 2 - text_object.get_width() // 2, HEIGHT // 2 - text_object.get_height() // 2)    #centers the text
 
+    screen.blit(text_object_shadow, text_location.move(5, 5))
     screen.blit(text_object, text_location) #blits the text_object at the proper location.
 
 def draw_text():

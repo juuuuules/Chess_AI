@@ -1,13 +1,26 @@
 from winreg import EnumValue
 import chess_evaluator, chess_machine
 
-def test_eval():
+opening_bongcloud = ['e2e4', 'e7e5', 'e1e2', 'e8e7']
+opening_ruy_lopez = ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6"]
+
+def test_opening():
     
     game_state = chess_machine.Game_State()
-    move_1 = chess_machine.Move((6, 4), (4, 4), game_state.board)
-    game_state.make_move(move_1)
+    str = "e2e4"
+    move = chess_machine.notation_to_move(str, game_state.board)
+    game_state.make_move(move)
 
-    eval = chess_evaluator.evaluate(game_state)
-    print("Eval is ", eval)
+    opening_move = chess_evaluator.get_opening_move(game_state)
 
-test_eval()
+    print("opening move is: ", opening_move)
+
+    if opening_move != None:
+        game_state.make_move(opening_move)
+
+    print("Move made")
+    print(game_state.board)
+
+
+
+test_opening()
