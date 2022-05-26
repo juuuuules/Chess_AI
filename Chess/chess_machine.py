@@ -214,13 +214,7 @@ class Game_State:
        
         moves = []
         self.is_in_check, self.pins, self.checks = self.get_pins_and_checks()  #sets field variables to be the result of the get_pins_and_checks function
-        
-        """
-        PRINT STATEMENT FOR DEBUGGING
-        """
-        #print(self.pins)    
-
-
+         
         if self.is_white_turn:
             king_row = self.white_king_location[0]
             king_col = self.white_king_location[1]
@@ -729,9 +723,7 @@ class Move():
     #conversion strings -- changing the ranks and files found in common chess notation to the rows and columns of our board matrix 
     #maps keys to values
     #key : value
-    ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}       #converts each rank of squares in standard chess notation to a row in the board matrix. For reference, the black pieces start out at RANK 8 but ROW 0. The white pieces start at RANK 1 but ROW 7.  
     rows_to_ranks = {7: "1", 6: "2", 5: "3", 4: "4", 3: "5", 2: "6", 1: "7", 0: "8"}       #same thing but vice versa
-    files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}       #converts each file of squares in standard chess notation to a column in the board matrix.
     cols_to_files = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}       #same thing but vice versa
 
     """
@@ -819,3 +811,20 @@ class Move():
         if self.is_capture:
             move_string += "x"
         return move_string + end_square
+
+
+
+
+ranks_to_rows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}       #converts each rank of squares in standard chess notation to a row in the board matrix. For reference, the black pieces start out at RANK 8 but ROW 0. The white pieces start at RANK 1 but ROW 7.  
+files_to_cols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}       #converts each file of squares in standard chess notation to a column in the board matrix.
+
+
+def notation_to_move(str, board):
+    start_row = ranks_to_rows[str[1:2]]
+    start_col = files_to_cols[str[0:1]]
+    end_row = ranks_to_rows[str[3:4]]
+    end_col = files_to_cols[str[2:3]]
+    
+    move = Move((start_row, start_col), (end_row, end_col), board)
+    return move
+                
