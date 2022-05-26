@@ -76,28 +76,11 @@ class Game_State:
         self.castle_rights_log = [Castle_Rights(self.current_castle_rights.white_kingside_castle, self.current_castle_rights.white_queenside_castle, 
                                                         self.current_castle_rights.black_kingside_castle, self.current_castle_rights.black_queenside_castle)]  #creates a list of castling_rights objects, taking a snapshot of the current castling rights state by creating a new Castle_Rights object 
 
- 
-    #returns true if a game state has repeated three times, false otherwise.
-    def three_move_repetition(self):
-    
-        """
-        
-        game_state_log = []
-        for i in range(len(self.move_log)):
-            temp_game_state = Game_State()
-            for j in range(0, i):
-                temp_game_state.make_move(self.move_log[j])
-            game_state_log.append(temp_game_state)
-        """
-        for board in self.game_state_log:
-            counter = 0
-            for i in range(len(self.game_state_log)):
-                if board == self.game_state_log[i]:
-                    counter += 1
-            if counter == 4:
-                return True
-        
-        return False
+        #half-move counter
+        self.half_move_counter = 0
+
+
+
     
 
     """
@@ -158,6 +141,9 @@ class Game_State:
         if is_real_move:
             copy_board = copy.deepcopy(self)
             self.game_state_log.append(copy_board.board)
+            
+        #update half move counter
+        self.half_move_counter += 1
 
     """
     Undo function that reverses previous move.
@@ -206,6 +192,10 @@ class Game_State:
             #Update draw log
             if is_real_undo:
                 self.game_state_log.pop()
+
+            #update half move counter
+            self.half_move_counter -= 1
+                
     """
     Function that gets a list of all the legal moves in a particular position.
     """
@@ -690,8 +680,18 @@ class Game_State:
                 return True
         return False
 
+    #returns true if a game state has repeated three times, false otherwise.
+    def three_move_repetition(self):
+        for board in self.game_state_log:
+            counter = 0
+            for i in range(len(self.game_state_log)):
+                if board == self.game_state_log[i]:
+                    counter += 1
+            if counter == 4:
+                return True
+        return False
 
-    def __eq__(self, other):    #comparing the self object to another move object, saved in the parameter other
+    def __eq__(self, other):    #comparing the self object to another game_state object, saved in the parameter other
         if isinstance(other, Game_State): #if "other" object is an instance of the Game_State class
             for row in range(len(self.board)):
                 for col in range(len(self.board[row])):       #iterate over the board

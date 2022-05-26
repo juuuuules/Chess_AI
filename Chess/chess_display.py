@@ -281,8 +281,7 @@ def main():
                                     """
                                     FOR TESTING PURPOSES
                                     """
-                                    print("evaluation is ", chess_evaluator.evaluate(game_state))
-                                    
+                                    print("Half move counter: ", game_state.half_move_counter)
                                     
                                     move_made = True
                                     animate = True
@@ -324,7 +323,10 @@ def main():
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
             game_state.make_move(ai_move)
-            print("execute time ", time.process_time() - start_time)
+            
+            print("Half move counter: ", game_state.half_move_counter)
+            print("execute time: ", time.process_time() - start_time)
+            
             move_made = True
             animate = True
 #            reset_castle_rights(game_state)
