@@ -167,7 +167,7 @@ position_scores =   {
 """
 Global variables.
 """
-CHECKMATE = 10000
+CHECKMATE = 100000
 STALEMATE = 0
 MAX_DEPTH = 4
 

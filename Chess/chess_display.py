@@ -280,7 +280,7 @@ def main():
                                     """
                                     PRINT STATEMENTS
                                     """
-                                    print("Move: ", str(move))
+                                    print("Move: ", str(ai_move))
                                     print("Half-move counter: ", game_state.half_move_counter)
                                     print("Evaluation: ", chess_evaluator.evaluate(game_state))
                                     print("Game Phase: ", chess_evaluator.game_phase)
