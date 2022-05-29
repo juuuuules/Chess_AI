@@ -275,7 +275,7 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
 
     minimax_counter += 1
 
-    if depth == 0:
+    if depth == 0 or game_state.is_checkmate or game_state.is_draw:
         return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
     
     #TO DO - Implement move ordering

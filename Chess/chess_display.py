@@ -8,8 +8,6 @@ import chess_machine, chess_evaluator
 import os
 import time
 
-print(os.path.isdir("images"))
-
 p.init()        #initializes pygame
 if os.path.isdir("Chess"): #since Evan's laptop is small enough that having a 1000 by 1000 pixel board is inconvenient, this if statment alters the size of the board depending on which computer is being used
     #this works because on Evan's computer the images directory is not in the directory chess_display is running in
@@ -312,10 +310,17 @@ def main():
         if not game_over and not is_human_turn:
 
             start_time = time.process_time()
+            
             ai_move = chess_evaluator.find_best_move(game_state, valid_moves)
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
+                print("Random move made")
             game_state.make_move(ai_move)
+            
+            end_time = time.process_time()
+
+            
+            
             move_made = True
             animate = True
 #            reset_castle_rights(game_state)
