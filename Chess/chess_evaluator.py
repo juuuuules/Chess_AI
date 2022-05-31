@@ -263,11 +263,7 @@ def find_best_move(game_state, valid_moves):
     #   minimax(game_state_clone, valid_moves, MAX_DEPTH, game_state.is_white_turn)
         minimax_alpha_beta(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, 1 if game_state.is_white_turn else -1)    
     #   minimax_alpha_beta_no_loop(game_state_clone, valid_moves, MAX_DEPTH, -CHECKMATE, CHECKMATE, game_state.is_white_turn)
-        print("minimax call number: " + str(minimax_counter)) #for testing
     #   print("quiescence call number is " + str(quiescence_counter))
-
-        print("Best move is ", best_move)
-        print("Game phase is ", game_phase)
 
         return best_move
 
