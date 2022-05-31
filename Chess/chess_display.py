@@ -320,10 +320,8 @@ def main():
             if ai_move is None:
                 ai_move = chess_evaluator.find_random_move(valid_moves)
                 print("Random move made")
-            game_state.make_move(ai_move)
-            print(ai_move.get_chess_notation())
-
-
+            game_state.make_move(ai_move, True)
+            
             end_time = time.process_time()
 
             
