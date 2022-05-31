@@ -297,7 +297,7 @@ def main():
                         player_clicks = []      #resets user clicks
                     reset_castle_rights(game_state)
                     if game_over == True:
-                        game_over == False
+                        game_over = False
 
                 if event.key == p.K_f:
                     print(game_state.current_castle_rights.white_kingside_castle)

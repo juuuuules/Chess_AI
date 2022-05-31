@@ -290,7 +290,7 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
     #TO DO - Implement move ordering
     valid_moves = sort_moves(game_state, valid_moves)
 
-    max_score = -CHECKMATE
+    max_score = -CHECKMATE + 1
     for move in valid_moves:
         game_state.make_move(move)
         next_moves = game_state.get_valid_moves()
