@@ -6,7 +6,7 @@ from tkinter.tix import MAX
 from typing import Counter
 import copy
 import chess_machine
-
+import time
 """
 Piece scores. Eventually we will have a weighted array.
 """
@@ -246,7 +246,7 @@ Best move functions.
 
 def find_best_move(game_state, valid_moves):
     game_state_clone = copy.deepcopy(game_state)        #copy the gamestate
-    global best_move, minimax_counter, quiescence_counter, is_theory
+    global best_move, minimax_counter, quiescence_counter, is_theory, game_phase
     best_move = None
     is_theory = False
 
@@ -266,6 +266,9 @@ def find_best_move(game_state, valid_moves):
         print("minimax call number: " + str(minimax_counter)) #for testing
     #   print("quiescence call number is " + str(quiescence_counter))
 
+        print("Best move is ", best_move)
+        print("Game phase is ", game_phase)
+
         return best_move
 
 
@@ -274,10 +277,16 @@ def minimax_alpha_beta(game_state, valid_moves, depth, alpha, beta, turn_multipl
     global best_move, minimax_counter
 
     minimax_counter += 1
+    # if game_state.is_checkmate:
+    #     print("CHECKMATE")
+    #     print("EVALUATION ", evaluate(game_state))
+    #     print("Turn multiplier: ", turn_multiplier)
+    #     time.sleep(1)
 
     if depth == 0 or game_state.is_checkmate or game_state.is_draw:
         return turn_multiplier * evaluate(game_state)   #turn multiplier is 1 if white turn, -1 if black turn. Makes evaluate function accurate
-    
+
+
     #TO DO - Implement move ordering
     valid_moves = sort_moves(game_state, valid_moves)
 
